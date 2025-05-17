@@ -1,12 +1,78 @@
-# React + Vite
+# 플로깅 버디 (Plogging Buddy)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+플로깅 버디는 환경 보호와 운동을 결합한 플로깅 활동을 위한 모임 플랫폼입니다.
 
-Currently, two official plugins are available:
+## 프로젝트 구조
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+├── src/ # 소스 코드 디렉토리
+│
+│ ├── assets/ # 이미지, 폰트 등 정적 자원
+│
+│ ├── components/ # 재사용 가능한 컴포넌트
+│ │ ├── Header.jsx # 상단 네비게이션 바 컴포넌트 (로그인 상태, 메뉴 네비게이션)
+│ │ ├── MeetingCard.jsx # 개별 플로깅 모임 카드 컴포넌트 (모임 제목, 날짜, 참가자 수, 상태 표시)
+│ │ ├── MeetingCardList.jsx # 플로깅 모임 목록을 그리드 형태로 표시 (필터링, 정렬 기능 포함)
+│ │ └── ProfileField.jsx # 프로필 정보 입력 필드 컴포넌트 (유효성 검사, 에러 메시지 표시)
+│
+│ ├── css/ # 스타일시트 파일
+│ │ ├── App.css # 전역 스타일 및 레이아웃 정의
+│ │ ├── colors.css # 프로젝트 전체 색상 팔레트 정의
+│ │ ├── header.css # 헤더 컴포넌트 스타일링
+│ │ ├── loginModal.css # 로그인 모달 스타일링
+│ │ ├── meetingDetail.css # 모임 상세 페이지 스타일링
+│ │ ├── mypage.css # 마이페이지 스타일링
+│ │ ├── status.css # 모임 상태 표시 스타일링
+│ │ └── typography.css # 폰트, 텍스트 스타일 정의
+│
+│ ├── login/ # 로그인 관련 컴포넌트
+│ │ ├── LoginModal.jsx # 로그인 모달 컴포넌트 (소셜 로그인, 폼 처리)
+│ │ └── OauthCallbackKakao.jsx # 카카오 로그인 콜백 처리 컴포넌트
+│
+│ ├── App.jsx # 메인 애플리케이션 컴포넌트
+│ ├── MainPage.jsx # 메인 페이지 컴포넌트
+│ ├── MeetingDetail.jsx # 모임 상세 페이지 컴포넌트
+│ ├── MyPage.jsx # 마이페이지 컴포넌트
+│ ├── ProfileInfo.jsx # 프로필 정보 컴포넌트
+│ ├── useGeolocation.jsx # 위치 정보 커스텀 훅
+│ └── main.jsx # 애플리케이션 진입점
 
-## Expanding the ESLint configuration
+## 주요 파일 설명
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 핵심 파일
+
+- `src/main.jsx`: React 애플리케이션의 진입점으로, 앱을 DOM에 마운트하고 전역 상태 관리 설정을 초기화합니다.
+- `src/App.jsx`: 애플리케이션의 루트 컴포넌트로, 라우팅 설정과 전체 레이아웃을 관리하며 전역 상태를 제공합니다.
+
+### 페이지 컴포넌트
+
+- `src/MainPage.jsx`: 메인 페이지로, 플로깅 모임 목록을 표시하고 모임 검색, 필터링 기능을 제공합니다.
+- `src/MeetingDetail.jsx`: 플로깅 모임의 상세 정보를 보여주는 페이지로, 모임 참가, 수정, 삭제 기능을 제공합니다.
+- `src/MyPage.jsx`: 사용자의 개인 정보와 활동 내역을 관리하는 페이지로, 참여한 모임 목록과 프로필 수정 기능을 제공합니다.
+- `src/ProfileInfo.jsx`: 사용자 프로필 정보를 표시하고 수정하는 컴포넌트로, 프로필 이미지 업로드와 정보 수정 기능을 제공합니다.
+
+### 재사용 컴포넌트 (components/)
+
+- `Header.jsx`: 상단 네비게이션 바로, 로고와 메뉴를 포함하며 로그인 상태에 따라 다른 메뉴를 표시합니다.
+- `MeetingCard.jsx`: 개별 플로깅 모임의 정보를 카드 형태로 표시하며, 모임 상태(모집중/마감/진행중)를 시각적으로 표현합니다.
+- `MeetingCardList.jsx`: 여러 개의 MeetingCard를 그리드 형태로 표시하며, 필터링과 정렬 기능을 제공합니다.
+- `ProfileField.jsx`: 프로필 정보 입력을 위한 재사용 가능한 입력 필드 컴포넌트로, 유효성 검사와 에러 메시지 표시 기능을 포함합니다.
+
+### 로그인 컴포넌트 (login/)
+
+- `LoginModal.jsx`: 로그인 모달 컴포넌트로, 카카오 소셜 로그인과 일반 로그인 폼을 제공하며 로그인 상태 관리를 처리합니다.
+- `OauthCallbackKakao.jsx`: 카카오 로그인 인증 후 콜백을 처리하는 컴포넌트로, 토큰 관리와 사용자 정보 저장을 담당합니다.
+
+### 스타일시트 (css/)
+
+- `App.css`: 애플리케이션의 전역 스타일과 기본 레이아웃을 정의합니다.
+- `colors.css`: 프로젝트 전체에서 사용되는 색상 팔레트를 정의하여 일관된 디자인을 유지합니다.
+- `header.css`: 헤더 컴포넌트의 스타일링을 담당하며, 반응형 디자인을 포함합니다.
+- `loginModal.css`: 로그인 모달의 스타일링을 담당하며, 애니메이션과 반응형 디자인을 포함합니다.
+- `meetingDetail.css`: 모임 상세 페이지의 스타일링을 담당하며, 지도 표시와 모임 정보 레이아웃을 정의합니다.
+- `mypage.css`: 마이페이지의 스타일링을 담당하며, 프로필 섹션과 활동 내역 레이아웃을 정의합니다.
+- `status.css`: 모임 상태 표시를 위한 스타일링을 담당하며, 다양한 상태에 따른 시각적 표현을 정의합니다.
+- `typography.css`: 프로젝트 전체의 폰트 패밀리, 크기, 행간 등 텍스트 관련 스타일을 정의합니다.
+
+### 유틸리티
+
+- `src/useGeolocation.jsx`: 사용자의 현재 위치 정보를 가져오는 커스텀 React 훅으로, 위치 추적과 에러 처리를 담당합니다.
