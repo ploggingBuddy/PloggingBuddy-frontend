@@ -1,0 +1,36 @@
+@import "./colors.css";
+
+header {
+  display: flex;
+  text-align: center;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray200);
+  width: 100%;
+  padding: 20px 0;
+}
+
+.logo {
+  width: 101px;
+  height: 32px;
+  margin-left: 120px;
+  margin-right: 160px;
+}
+
+.header-menu {
+  width: 114px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-menu div {
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.header-menu div a {
+  height: 18px;
+  text-decoration: none;
+  color: var(--black);
+}

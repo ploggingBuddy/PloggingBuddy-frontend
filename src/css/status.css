@@ -1,0 +1,18 @@
+/* 카드 상태별 배경색 */
+.meeting-status {
+  display: inline-flex;
+  padding: 4px 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  color: var(--black);
+  background: var(--blue-light); /* 기본값: 모집 중 */
+}
+
+.meeting-status.closed {
+  background: var(--red-light);
+}
+
+.meeting-status.hold {
+  background: var(--yellow-light);
+}

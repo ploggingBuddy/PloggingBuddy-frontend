@@ -1,0 +1,55 @@
+:root {
+  /* Font weights */
+  --font-regular: 400;
+  --font-semibold: 600;
+
+  /* Font sizes */
+  --font-size-24: 24px;
+  --font-size-16: 16px;
+  --font-size-14: 14px;
+  --font-size-12: 12px;
+
+  /* Line heights */
+  --line-height-28: 28px;
+  --line-height-24: 24px;
+  --line-height-20: 20px;
+  --line-height-18: 18px;
+  --line-height-14: 14px;
+}
+
+/* Typography utility classes */
+.sb-24 {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-size-24);
+  line-height: var(--line-height-28);
+}
+
+.sb-16 {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-20);
+}
+
+.rg-16 {
+  font-weight: var(--font-regular);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-24);
+}
+
+.sb-14 {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-18);
+}
+
+.rg-14 {
+  font-weight: var(--font-regular);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-18);
+}
+
+.rg-12 {
+  font-weight: var(--font-regular);
+  font-size: var(--font-size-12);
+  line-height: var(--line-height-14);
+}

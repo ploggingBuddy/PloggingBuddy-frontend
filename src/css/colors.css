@@ -1,0 +1,19 @@
+:root {
+  /* Primary */
+  --primary: #6dbe45;
+  --primary-light: #ceefbe;
+  --primary-dark: #347812;
+
+  /* Grayscale */
+  --white: #ffffff;
+  --gray50: #f0f0f0;
+  --gray200: #cacaca;
+  --gray400: #989898;
+  --black: #1a1a1a;
+
+  /* Semantic */
+  --red: #ff0000;
+  --red-light: #ffc3c3;
+  --yellow-light: #fdecb8;
+  --blue-light: #bedaef;
+}
