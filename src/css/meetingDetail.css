@@ -51,7 +51,6 @@
   width: 100px;
   height: 4px;
   -webkit-appearance: none;
-  background: var(--primary);
   border-radius: 2px;
   outline: none;
 }

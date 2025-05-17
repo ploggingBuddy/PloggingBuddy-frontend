@@ -14,7 +14,7 @@
   background: var(--white);
   border-radius: 20px;
   width: 293px;
-  height: 194px;
+  height: fit-content;
   padding: 64px;
   position: relative;
 }
@@ -36,4 +36,57 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+}
+
+/* =========================
+   회원가입
+   ========================= */
+.login-modal-content .profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 44px 0;
+}
+.login-field,
+.login-field--input {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.login-field .value {
+  color: var(--gray400);
+}
+.login-field label {
+  color: var(--black);
+  margin-bottom: 8px;
+}
+.login-field--input {
+  margin-top: 16px;
+}
+.login-field--input input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: none;
+  outline: none;
+  border: 1.5px solid var(--gray200);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.signup-btn {
+  background: var(--primary);
+  color: var(--white);
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 4px;
+  margin-top: 44px;
+}
+
+.signup-btn:hover {
+  background: var(--primary-dark);
 }
