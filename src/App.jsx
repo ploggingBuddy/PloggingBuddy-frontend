@@ -5,6 +5,7 @@ import MainPage from "./MainPage"; // 메인 페이지 컴포넌트(예시)
 import LoginModal from "./login/LoginModal";
 import { useState } from "react";
 import MeetingDetail from "./MeetingDetail";
+import OauthCallbackKakao from "./login/OauthCallbackKakao";
 
 function App() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -23,6 +24,7 @@ function App() {
         <Route path="/main" element={<MainPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/meeting/:id" element={<MeetingDetail />} />
+        <Route path="/kakao" element={<OauthCallbackKakao />} />
         {/* 필요시 다른 라우트도 추가 */}
       </Routes>
     </BrowserRouter>
