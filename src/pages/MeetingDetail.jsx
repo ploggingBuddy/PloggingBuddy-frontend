@@ -29,7 +29,7 @@ function MeetingDetail() {
     });
 
     // TODO: 실제로는 백엔드에서 현재 로그인한 사용자가 모임 생성자인지 확인
-    setIsCreator(false); // 임시로 true로 설정
+    setIsCreator(true); // 임시로 true로 설정
   }, [id]);
 
   const handleJoinMeeting = () => {

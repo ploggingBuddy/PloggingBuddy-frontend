@@ -5,7 +5,7 @@ import logo from "../assets/logo.svg";
 import "../css/loginModal.css";
 import profileDefault from "../assets/profile_default.jpg";
 
-const KAKAO_JS_KEY = "";
+const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_API_KEY;
 
 function LoginModal({ open, onClose, onLoginSuccess }) {
   const [kakaoUser, setKakaoUser] = useState(null);
@@ -27,8 +27,8 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
     }
   }, []);
 
-  const KAKAO_REST_API_KEY = import.meta.env.KAKAO_REST_API_KEY;
-  const REDIRECT_URI = import.meta.env.BACKEND_API_URL;
+  const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const REDIRECT_URI = "http://localhost:5173/oauth/callback/kakao";
 
   const handleKakaoLogin = () => {
     window.location.href =
@@ -49,7 +49,7 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
         `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lng}&y=${lat}`,
         {
           headers: {
-            Authorization: `KakaoAK  ${KAKAO_REST_API_KEY}`, // 본인 REST API 키로 대체
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`, // 공백 하나로 수정
           },
         }
       )
