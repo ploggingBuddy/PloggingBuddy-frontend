@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import useGeolocation from "../useGeolocation";
+import useGeolocation from "./useGeolocation";
 import kakaoLogin from "../assets/kakao_login_large_wide.png";
 import logo from "../assets/logo.svg";
 import "../css/loginModal.css";
 import profileDefault from "../assets/profile_default.jpg";
 
-const KAKAO_JS_KEY = "";
+const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_API_KEY;
 
 function LoginModal({ open, onClose, onLoginSuccess }) {
   const [kakaoUser, setKakaoUser] = useState(null);
@@ -27,29 +27,15 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
     }
   }, []);
 
-  // 카카오 로그인
+  const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const REDIRECT_URI = "http://localhost:5173/oauth/callback/kakao";
+
   const handleKakaoLogin = () => {
-    if (!window.Kakao) return;
-    window.Kakao.Auth.login({
-      scope: "profile_nickname,profile_image",
-      success: function (authObj) {
-        window.Kakao.API.request({
-          url: "/v2/user/me",
-          success: function (res) {
-            setKakaoUser({
-              nickname: res.kakao_account.profile.nickname,
-              profileImg: res.kakao_account.profile.profile_image_url,
-            });
-          },
-          fail: function (error) {
-            alert("카카오 사용자 정보 요청 실패: " + JSON.stringify(error));
-          },
-        });
-      },
-      fail: function (err) {
-        alert("카카오 로그인 실패: " + JSON.stringify(err));
-      },
-    });
+    window.location.href =
+      `https://kauth.kakao.com/oauth/authorize?` +
+      `client_id=${KAKAO_REST_API_KEY}` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&response_type=code`;
   };
 
   // 위치 정보가 있으면 region에 자동 입력 (reverse geocoding은 실제 서비스에서 필요)
@@ -63,7 +49,7 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
         `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lng}&y=${lat}`,
         {
           headers: {
-            Authorization: "KakaoAK ", // 본인 REST API 키로 대체
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`, // 공백 하나로 수정
           },
         }
       )

@@ -1,5 +1,10 @@
-import LoginModal from "./login/LoginModal";
+import LoginModal from "../login/LoginModal";
 import { useState } from "react";
+import React from "react";
+import Header from "../components/Header";
+import UserInfo from "../components/UserInfo";
+import MapSection from "../components/MapSection";
+import CreateButton from "../components/CreateButton";
 
 function MainPage() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -22,6 +27,12 @@ function MainPage() {
           <div>지역: {user.region}</div>
         </div>
       )}
+      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
+        <h2>모임</h2>
+        <UserInfo />
+        <CreateButton />
+        <MapSection />
+      </div>
     </div>
   );
 }

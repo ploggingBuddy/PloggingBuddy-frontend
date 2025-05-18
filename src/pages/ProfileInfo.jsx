@@ -1,6 +1,6 @@
 import { useState } from "react";
-import profileDefault from "./assets/profile_default.jpg";
-import ProfileField from "./components/ProfileField";
+import profileDefault from "../assets/profile_default.jpg";
+import ProfileField from "../components/ProfileField";
 
 function ProfileInfo() {
   // TODO: 백엔드에서 유저 정보 받아오기 (GET /api/user/profile)
