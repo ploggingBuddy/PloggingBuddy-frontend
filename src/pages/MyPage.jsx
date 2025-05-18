@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import Header from "./components/Header";
 import ProfileInfo from "./ProfileInfo";
-import MeetingCardList from "./components/MeetingCardList";
-import "./css/mypage.css";
+import MeetingCardList from "../components/MeetingCardList";
+import "../css/mypage.css";
 
 function ActivityTab({ tab, setTab }) {
   return (

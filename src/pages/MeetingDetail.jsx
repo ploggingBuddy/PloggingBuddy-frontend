@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "./css/meetingDetail.css";
+import "../css/meetingDetail.css";
 
 function MeetingDetail() {
   const { id } = useParams();

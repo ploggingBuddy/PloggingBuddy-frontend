@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import MyPage from "./MyPage";
-import MainPage from "./MainPage"; // 메인 페이지 컴포넌트(예시)
+import MyPage from "./pages/MyPage";
+import MainPage from "./pages/MainPage"; // 메인 페이지 컴포넌트(예시)
 import LoginModal from "./login/LoginModal";
 import { useState } from "react";
-import MeetingDetail from "./MeetingDetail";
+import MeetingDetail from "./pages/MeetingDetail";
 import OauthCallbackKakao from "./login/OauthCallbackKakao";
 
 function App() {

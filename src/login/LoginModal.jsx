@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import useGeolocation from "../useGeolocation";
+import useGeolocation from "./useGeolocation";
 import kakaoLogin from "../assets/kakao_login_large_wide.png";
 import logo from "../assets/logo.svg";
 import "../css/loginModal.css";
 import profileDefault from "../assets/profile_default.jpg";
-import { useNavigate } from "react-router-dom";
 
-const KAKAO_JS_KEY = "1e7281e3573df762c1adf01537b45653";
+const KAKAO_JS_KEY = "";
 
 function LoginModal({ open, onClose, onLoginSuccess }) {
   const [kakaoUser, setKakaoUser] = useState(null);
