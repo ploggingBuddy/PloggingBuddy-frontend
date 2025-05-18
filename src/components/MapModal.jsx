@@ -65,26 +65,27 @@ const MapModal = ({ onClose, onSelect }) => {
         <div id="map" style={{ flex: 1 }} />
         <div
           style={{
-            backgroundColor: "#eee",
             padding: "12px 20px",
             display: "flex",
             justifyContent: "flex-end",
+            marginTop: "2px", 
           }}
         >
           <button
             onClick={onClose}
             style={{
-              backgroundColor: "green",
+              backgroundColor: "#6DBE45",
               color: "white",
               padding: "8px 16px",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "6px", //
               cursor: "pointer",
             }}
           >
             닫기
           </button>
         </div>
+
       </div>
     </div>
   );

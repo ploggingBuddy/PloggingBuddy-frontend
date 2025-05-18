@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 function UserInfo() {
-  // 나중에 백에서 받아올 수 있도록 props 처리 or useEffect fetch 가능
+  const [user, setUser] = useState({ name: '', profileImage: '' });
+
+  useEffect(() => {
+    // 백엔드에서 사용자 정보 받아오기 (예시 URL)
+    fetch('https://backend.com/api/user/me')
+      .then((res) => res.json())
+      .then((data) => {
+        // 예시: data = { name: '구유경', profileImage: 'https://...' }
+        setUser({
+          name: data.name,
+          profileImage: data.profileImage,
+        });
+      })
+      .catch((err) => {
+        console.error('사용자 정보 가져오기 실패:', err);
+      });
+  }, []);
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
       <div
@@ -11,9 +28,20 @@ function UserInfo() {
           borderRadius: '50%',
           backgroundColor: '#ddd',
           marginRight: '10px',
+          overflow: 'hidden',
         }}
-      ></div>
-      <span style={{ fontWeight: 'bold' }}>구유경 님</span> {/* 나중에 동적 처리 */}
+      >
+        {user.profileImage && (
+          <img
+            src={user.profileImage}
+            alt="사용자 프로필"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        )}
+      </div>
+      <span style={{ fontWeight: 'bold' }}>
+        {user.name ? `${user.name} 님` : '사용자'}
+      </span>
     </div>
   );
 }

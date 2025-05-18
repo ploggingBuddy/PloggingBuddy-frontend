@@ -12,14 +12,14 @@ function CreateButton() {
     <button
       onClick={handleClick}
       style={{
-        backgroundColor: 'green',
+        backgroundColor: '#6DBE45',
         color: 'white',
         border: 'none',
         padding: '10px 15px',
         borderRadius: '5px',
         cursor: 'pointer',
         float: 'right',
-        marginBottom: '20px',
+        marginTop: '20px',
       }}
     >
       + 모임 생성하기

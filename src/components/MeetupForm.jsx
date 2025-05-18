@@ -63,7 +63,7 @@ const MeetupForm = ({
       <button
         type="submit"
         style={{
-          backgroundColor: "green",
+          backgroundColor: "#6DBE45",
           color: "white",
           padding: "10px 20px",
           border: "none",

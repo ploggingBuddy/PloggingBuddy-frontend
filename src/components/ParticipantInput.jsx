@@ -9,6 +9,7 @@ const ParticipantInput = ({ value, onChange }) => (
         placeholder="N"
         value={value}
         onChange={onChange}
+        min={0}
         style={{ width: '100%', padding: '8px' }}
       />
       <span style={{ marginLeft: '8px' }}>명</span>
