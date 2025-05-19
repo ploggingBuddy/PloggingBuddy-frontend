@@ -11,6 +11,7 @@ function ProfileInfo() {
   const token = localStorage.getItem("kakao_token");
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
+  console.log(token);
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
   useEffect(() => {
     async function fetchUser() {
