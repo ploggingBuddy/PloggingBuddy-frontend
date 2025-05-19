@@ -8,6 +8,7 @@ function OauthCallbackKakao() {
     // 1. URL에서 token 파싱
     const params = new URL(window.location.href).searchParams;
     const token = params.get("code");
+    console.log(token);
 
     if (token) {
       // 2. localStorage에 저장
