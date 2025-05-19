@@ -29,6 +29,7 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
 
   const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const REDIRECT_URI = "http://localhost:5173/oauth/callback/kakao";
+  const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleKakaoLogin = () => {
     window.location.href =
