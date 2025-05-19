@@ -3,7 +3,6 @@ import useGeolocation from "./useGeolocation";
 import kakaoLogin from "../assets/kakao_login_large_wide.png";
 import logo from "../assets/logo.svg";
 import "../css/loginModal.css";
-import profileDefault from "../assets/profile_default.jpg";
 
 const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_API_KEY;
 
@@ -12,11 +11,26 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
   const [region, setRegion] = useState("");
   const [dong, setDong] = useState("");
 
+  // 카카오 SDK 로드
+  useEffect(() => {
+    if (!window.Kakao) {
+      const script = document.createElement("script");
+      script.src = "https://developers.kakao.com/sdk/js/kakao.js";
+      script.onload = () => {
+        window.Kakao.init(KAKAO_JS_KEY);
+      };
+      document.body.appendChild(script);
+    } else {
+      window.Kakao.init(KAKAO_JS_KEY);
+    }
+  }, []);
+
   const handleKakaoLogin = () => {
     // 백엔드 로그인 URL로 리다이렉트
     window.location.href = import.meta.env.VITE_BACKEND_LOGIN_API_URL;
   };
-  // 위치 정보가 있으면 region에 자동 입력
+
+  // 위치 정보가 있으면 region에 자동 입력 (reverse geocoding은 실제 서비스에서 필요)
   useEffect(() => {
     if (location) {
       setRegion(`${location.latitude}, ${location.longitude}`);
