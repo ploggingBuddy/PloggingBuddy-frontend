@@ -12,24 +12,21 @@ function MainPage() {
 
   return (
     <div>
-      <button onClick={() => setLoginOpen(true)}>로그인</button>
       <LoginModal
         open={loginOpen}
         onClose={() => setLoginOpen(false)}
         onLoginSuccess={setUser}
       />
-      {user && (
-        <div>
-          <h3>로그인 완료!</h3>
-          <div>
-            {user.nickname} ({user.email})
-          </div>
-          <div>지역: {user.region}</div>
-        </div>
-      )}
       <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
         <h2>모임</h2>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
           <UserInfo />
           <CreateButton />
         </div>
