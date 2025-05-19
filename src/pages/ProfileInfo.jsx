@@ -33,8 +33,10 @@ function ProfileInfo() {
     fetchUser();
   }, []);
 
-  // TODO: 각 필드 수정 시 PATCH /api/user/profile 등으로 변경 요청
-  const handleEdit = (field) => {
+  // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
+  const handleNicknameEdit = (field) => {};
+
+  const handleBioEdit = (field) => {
     // 예시: fetch('/api/user/profile', { method: 'PATCH', body: ... })
     alert(`${field}이(가) 수정되었습니다.`);
   };
@@ -54,12 +56,6 @@ function ProfileInfo() {
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           onEdit={() => handleEdit("닉네임")}
-        />
-        <ProfileField
-          label="자기소개"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          onEdit={() => handleEdit("자기소개")}
         />
         <div>
           <label className="rg-14">이메일</label>
