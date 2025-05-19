@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 
