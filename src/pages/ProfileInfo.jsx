@@ -9,19 +9,17 @@ function ProfileInfo() {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("kakao_token");
+  const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/member/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         console.log(data);
@@ -37,17 +35,14 @@ function ProfileInfo() {
   // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
   const handleNicknameEdit = async (newNickname) => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/member/nickname`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ nickname: newNickname }),
-        }
-      );
+      const res = await fetch(`${BACKEND_API_URL}/member/nickname`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nickname: newNickname }),
+      });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
       // 필요하다면 setNickname(newNickname) 등으로 상태도 갱신
