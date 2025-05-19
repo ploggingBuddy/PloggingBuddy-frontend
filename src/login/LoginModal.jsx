@@ -28,8 +28,7 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
   }, []);
 
   const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-  const REDIRECT_URI =
-    "https://plogging-buddy.vercel.app//oauth/callback/kakao";
+  const REDIRECT_URI = "https://plogging-buddy.vercel.app/oauth/callback/kakao";
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleKakaoLogin = () => {
