@@ -12,6 +12,22 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
   const [region, setRegion] = useState("");
   const [dong, setDong] = useState("");
 
+  // URL에서 토큰 확인
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const userData = urlParams.get("userData");
+
+    if (token && userData) {
+      // 토큰과 사용자 데이터가 있으면 로그인 성공 처리
+      onLoginSuccess({
+        token,
+        userData: JSON.parse(decodeURIComponent(userData)),
+      });
+      onClose();
+    }
+  }, [onLoginSuccess, onClose]);
+
   // 카카오 SDK 로드
   useEffect(() => {
     if (!window.Kakao) {

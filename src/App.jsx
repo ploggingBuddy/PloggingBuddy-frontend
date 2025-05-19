@@ -23,15 +23,20 @@ function ProtectedRoute({ children }) {
 }
 
 function AppContent() {
-  const { showLoginModal, login } = useAuth();
+  const { showLoginModal, login, setShowLoginModal } = useAuth();
+
+  const handleLoginSuccess = (data) => {
+    login(data);
+    setShowLoginModal(false);
+  };
 
   return (
     <>
       <Header />
       <LoginModal
         open={showLoginModal}
-        onClose={() => {}} // 모달을 닫을 수 없도록 빈 함수
-        onLoginSuccess={login}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={handleLoginSuccess}
       />
       <Routes>
         <Route path="/" element={<MainPage />} />
