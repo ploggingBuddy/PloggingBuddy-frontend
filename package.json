@@ -8,8 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-     "start": "react-scripts start"
-    
+    "start": "react-scripts start",
+    "vercel-deploy": "next build && next export"
   },
   "dependencies": {
     "react": "^19.1.0",
