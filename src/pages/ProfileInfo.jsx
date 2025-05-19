@@ -3,11 +3,35 @@ import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 
 function ProfileInfo() {
-  // TODO: 백엔드에서 유저 정보 받아오기 (GET /api/user/profile)
   const [nickname, setNickname] = useState("example_name");
   const [bio, setBio] = useState("example_name");
   const [email, setEmail] = useState("example_name");
   const [region, setRegion] = useState("example_name");
+  const [loading, setLoading] = useState(true);
+  // ✅ 유저 정보 불러오기  (GET /api/member/me)
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const token = localStorage.getItem("kakao_token");
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/member/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
+        const data = await res.json();
+        console.log(data);
+      } catch (e) {
+        alert(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, []);
 
   // TODO: 각 필드 수정 시 PATCH /api/user/profile 등으로 변경 요청
   const handleEdit = (field) => {
