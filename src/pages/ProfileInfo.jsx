@@ -4,15 +4,16 @@ import ProfileField from "../components/ProfileField";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState("example_name");
-  const [bio, setBio] = useState("example_name");
   const [email, setEmail] = useState("example_name");
   const [region, setRegion] = useState("example_name");
   const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("kakao_token");
+
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
   useEffect(() => {
     async function fetchUser() {
       try {
-        const token = localStorage.getItem("kakao_token");
         const res = await fetch(
           `${import.meta.env.VITE_BACKEND_API_URL}/member/me`,
           {
@@ -34,11 +35,25 @@ function ProfileInfo() {
   }, []);
 
   // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
-  const handleNicknameEdit = (field) => {};
-
-  const handleBioEdit = (field) => {
-    // 예시: fetch('/api/user/profile', { method: 'PATCH', body: ... })
-    alert(`${field}이(가) 수정되었습니다.`);
+  const handleNicknameEdit = async (newNickname) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/member/nickname`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ nickname: newNickname }),
+        }
+      );
+      if (!res.ok) throw new Error("닉네임 변경 실패");
+      alert("닉네임이 성공적으로 변경되었습니다!");
+      // 필요하다면 setNickname(newNickname) 등으로 상태도 갱신
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   // TODO: 회원 탈퇴 API 연동 (DELETE /api/user)
@@ -55,7 +70,7 @@ function ProfileInfo() {
           label="닉네임"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          onEdit={() => handleEdit("닉네임")}
+          onEdit={() => handleNicknameEdit(e.target.value)}
         />
         <div>
           <label className="rg-14">이메일</label>
