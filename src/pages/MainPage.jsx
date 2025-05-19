@@ -1,22 +1,14 @@
-import LoginModal from "../login/LoginModal";
-import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import React from "react";
-import Header from "../components/Header";
 import UserInfo from "../components/UserInfo";
 import MapSection from "../components/MapSection";
 import CreateButton from "../components/CreateButton";
 
 function MainPage() {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const { isLoggedIn } = useAuth();
 
   return (
     <div>
-      <LoginModal
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onLoginSuccess={setUser}
-      />
       <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
         <h2>모임</h2>
         <div
@@ -28,7 +20,7 @@ function MainPage() {
           }}
         >
           <UserInfo />
-          <CreateButton />
+          {isLoggedIn && <CreateButton />}
         </div>
         <MapSection />
       </div>
