@@ -12,18 +12,12 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
   const [region, setRegion] = useState("");
   const [dong, setDong] = useState("");
 
-  // URL에서 토큰 확인
+  // 로컬 스토리지에서 토큰 확인
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    const userData = urlParams.get("userData");
-
-    if (token && userData) {
-      // 토큰과 사용자 데이터가 있으면 로그인 성공 처리
-      onLoginSuccess({
-        token,
-        userData: JSON.parse(decodeURIComponent(userData)),
-      });
+    const token = localStorage.getItem("kakao_token");
+    if (token) {
+      // 토큰이 있으면 로그인 성공 처리
+      onLoginSuccess({ token });
       onClose();
     }
   }, [onLoginSuccess, onClose]);

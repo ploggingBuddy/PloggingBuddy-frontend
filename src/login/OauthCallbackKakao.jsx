@@ -11,7 +11,7 @@ function OauthCallbackKakao() {
 
     if (token) {
       // 2. localStorage에 저장
-      localStorage.setItem("token", token);
+      localStorage.setItem("kakao_token", token);
       // 3. 홈으로 리다이렉트
       navigate("/");
     } else {
