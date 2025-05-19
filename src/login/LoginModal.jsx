@@ -8,38 +8,15 @@ import profileDefault from "../assets/profile_default.jpg";
 const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_API_KEY;
 
 function LoginModal({ open, onClose, onLoginSuccess }) {
-  const [kakaoUser, setKakaoUser] = useState(null);
   const location = useGeolocation();
   const [region, setRegion] = useState("");
   const [dong, setDong] = useState("");
 
-  // 카카오 SDK 로드
-  useEffect(() => {
-    if (!window.Kakao) {
-      const script = document.createElement("script");
-      script.src = "https://developers.kakao.com/sdk/js/kakao.js";
-      script.onload = () => {
-        window.Kakao.init(KAKAO_JS_KEY);
-      };
-      document.body.appendChild(script);
-    } else {
-      window.Kakao.init(KAKAO_JS_KEY);
-    }
-  }, []);
-
-  const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-  // const REDIRECT_URI = "https://plogging-buddy.vercel.app/oauth/callback/kakao";
-  const REDIRECT_URI = import.meta.env.VITE_BACKEND_LOGIN_API_URL;
-
   const handleKakaoLogin = () => {
-    window.location.href =
-      `https://kauth.kakao.com/oauth/authorize?` +
-      `client_id=${KAKAO_REST_API_KEY}` +
-      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-      `&response_type=code`;
+    // 백엔드 로그인 URL로 리다이렉트
+    window.location.href = import.meta.env.VITE_BACKEND_LOGIN_API_URL;
   };
-
-  // 위치 정보가 있으면 region에 자동 입력 (reverse geocoding은 실제 서비스에서 필요)
+  // 위치 정보가 있으면 region에 자동 입력
   useEffect(() => {
     if (location) {
       setRegion(`${location.latitude}, ${location.longitude}`);
@@ -65,23 +42,6 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
         });
     }
   }, [location]);
-
-  // 로그인 완료 처리
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: 서버에 회원가입/로그인 요청
-    onLoginSuccess({
-      ...kakaoUser,
-      region,
-    });
-    onClose();
-  };
-  const kakaoUser1 = {
-    nickname: "홍길동",
-    profileImg: profileDefault,
-    email: "test@test.com",
-    region: "서울시 강남구",
-  };
 
   if (!open) return null;
 
