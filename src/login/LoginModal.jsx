@@ -5,6 +5,7 @@ import logo from "../assets/logo.svg";
 import "../css/loginModal.css";
 
 const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_API_KEY;
+const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 
 function LoginModal({ open, onClose, onLoginSuccess }) {
   const location = useGeolocation();
