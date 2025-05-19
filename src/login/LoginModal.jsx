@@ -15,7 +15,6 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
   // 로컬 스토리지에서 토큰 확인
   useEffect(() => {
     const token = localStorage.getItem("kakao_token");
-    console.log(token);
     if (token) {
       // 토큰이 있으면 로그인 성공 처리
       onLoginSuccess({ token });

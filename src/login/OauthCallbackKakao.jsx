@@ -8,11 +8,10 @@ function OauthCallbackKakao() {
     // 1. URL에서 token 파싱
     const params = new URL(window.location.href).searchParams;
     const token = params.get("code");
-    console.log(typeof token);
 
     if (token) {
       // 2. localStorage에 저장
-      localStorage.setItem("kakao_token", JSON.stringify(token)); // ✅ 문자열로 변환해서 저장
+      localStorage.setItem("kakao_token", token); // ✅ 문자열로 변환해서 저장
       // 3. 홈으로 리다이렉트
       navigate("/");
     } else {
