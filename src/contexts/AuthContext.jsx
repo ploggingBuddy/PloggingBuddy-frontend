@@ -17,7 +17,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (token) => {
-    localStorage.setItem("kakao_token", token);
     setIsLoggedIn(true);
     setShowLoginModal(false);
   };
