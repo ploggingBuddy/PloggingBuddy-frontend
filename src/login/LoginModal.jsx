@@ -94,28 +94,6 @@ function LoginModal({ open, onClose, onLoginSuccess }) {
             <img src={kakaoLogin} alt="카카오 로그인" />
           </button>
         </div>
-        <form className="login-modal-content" onSubmit={handleSubmit}>
-          <img
-            className="profile-img"
-            src={kakaoUser1.profileImg}
-            alt="프로필"
-          />
-          <div className="login-field">
-            <label className="rg-14">닉네임</label>
-            <span className="value rg-14">{kakaoUser1.nickname}</span>
-          </div>
-          <div className="login-field--input">
-            <label className="rg-14">지역 정보 </label>
-            <input
-              value={dong}
-              onChange={(e) => setRegion(e.target.value)}
-              required
-            />
-          </div>
-          <button className="signup-btn" type="submit">
-            회원가입
-          </button>
-        </form>
       </div>
       <style>{`
         

@@ -1,37 +1,78 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
+import { AuthProvider } from "./contexts/AuthContext";
+import LoginModal from "./login/LoginModal";
+import { useAuth } from "./contexts/AuthContext";
 
 import MyPage from "./pages/MyPage";
 import MainPage from "./pages/MainPage";
 import CreateMeetup from "./pages/CreateMeetup";
 import MeetingDetail from "./pages/MeetingDetail";
-
-import LoginModal from "./login/LoginModal";
 import OauthCallbackKakao from "./login/OauthCallbackKakao";
 
-function App() {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [user, setUser] = useState(null);
+// 보호된 라우트 컴포넌트
+function ProtectedRoute({ children }) {
+  const { isLoggedIn, showLoginModal, setShowLoginModal } = useAuth();
+
+  if (!isLoggedIn) {
+    setShowLoginModal(true);
+    return null;
+  }
+
+  return children;
+}
+
+function AppContent() {
+  const { showLoginModal, login } = useAuth();
 
   return (
-    <BrowserRouter>
+    <>
       <Header />
       <LoginModal
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onLoginSuccess={setUser}
+        open={showLoginModal}
+        onClose={() => {}} // 모달을 닫을 수 없도록 빈 함수
+        onLoginSuccess={login}
       />
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/main" element={<MainPage />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/meeting/:id" element={<MeetingDetail />} />
+        <Route
+          path="/mypage"
+          element={
+            <ProtectedRoute>
+              <MyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/meeting/:id"
+          element={
+            <ProtectedRoute>
+              <MeetingDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/oauth/callback/kakao" element={<OauthCallbackKakao />} />
-        <Route path="/create" element={<CreateMeetup />} />
-        {/* 필요시 다른 라우트도 추가 */}
+        <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreateMeetup />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-    </BrowserRouter>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
