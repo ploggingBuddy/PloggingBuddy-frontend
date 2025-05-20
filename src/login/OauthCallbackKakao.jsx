@@ -1,3 +1,5 @@
+//OauthCallbackKakao.jsx
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,26 +8,15 @@ function OauthCallbackKakao() {
 
   useEffect(() => {
     const params = new URL(window.location.href).searchParams;
-    const token = params.get("token"); // ✅ 'code'가 아니라 'token'
+    const token = params.get("code");
 
     if (token) {
       localStorage.setItem("kakao_token", token);
-
-      // 사용자 정보 요청해서 user 저장
-      fetch(`${import.meta.env.VITE_BACKEND_API_URL}/member/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(res => res.json())
-        .then(data => {
-          localStorage.setItem("user", JSON.stringify(data)); // ✅ user 저장!
-          navigate("/");
-        })
-        .catch((err) => {
-          console.error("사용자 정보 가져오기 실패:", err);
-          navigate("/");
-        });
+      // 홈으로 리다이렉트
+      navigate("/");
     } else {
-      alert("토큰이 없습니다.");
+      // 토큰이 없을 때 예외 처리(에러 페이지 등)
+      alert("로그인 토큰이 없습니다.");
       navigate("/");
     }
   }, [navigate]);
