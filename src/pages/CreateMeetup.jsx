@@ -18,6 +18,9 @@ const CreateMeetup = () => {
 
   const [showMap, setShowMap] = useState(false);
 
+  const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
+  const token = localStorage.getItem("kakao_token");
+
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
@@ -122,25 +125,26 @@ const CreateMeetup = () => {
   };
 
   try {
-    const token = localStorage.getItem("token"); // JWT 꺼내기
-    const res = await fetch("http://added-kamilah-hamlsy-00a9612d.koyeb.app/gathering/new", {
+    const res = await fetch(`${BACKEND_API_URL}/gathering/new`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, //JWT 추가
+        Authorization: `Bearer ${token}`, // ✅ profileinfo와 동일하게
       },
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      throw new Error(`서버 오류: ${res.status}`);
+      const errText = await res.text();
+      throw new Error(`서버 오류: ${res.status}\n${errText}`);
     }
 
-    alert("모임 생성 완료!");
+    alert("✅ 모임이 성공적으로 생성되었습니다!");
   } catch (error) {
-    console.error("모임 생성 중 오류:", error);
+    console.error("❌ 모임 생성 중 오류:", error);
     alert("모임 생성 실패. 콘솔 확인!");
   }
+
 };
 
 
