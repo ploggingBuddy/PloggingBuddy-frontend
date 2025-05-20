@@ -148,7 +148,7 @@ function ProfileInfo() {
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={tempRegion ?? region}
+              value={region}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
