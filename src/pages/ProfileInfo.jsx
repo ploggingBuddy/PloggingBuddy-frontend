@@ -17,7 +17,7 @@ function ProfileInfo() {
       try {
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
           headers: {
-            Authorization: `${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
@@ -39,7 +39,7 @@ function ProfileInfo() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ nickname: newNickname }),
       });
