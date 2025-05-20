@@ -11,9 +11,10 @@ function ProfileField({
 }) {
   const inputRef = useRef(null);
 
-  const handleEdit = () => {
-    if (inputRef.current) {
-      onEdit(inputRef.current.value);
+  const handleEdit = (e) => {
+    e.preventDefault(); // 이벤트 기본 동작 방지
+    if (inputRef.current && typeof onEdit === "function") {
+      onEdit();
     }
   };
 
@@ -29,7 +30,7 @@ function ProfileField({
           disabled={!editable}
         />
         {onEdit && (
-          <button className="edit-btn" onClick={handleEdit}>
+          <button type="button" className="edit-btn" onClick={handleEdit}>
             <img className="edit-icon" src={editIcon} alt="edit" />
           </button>
         )}
