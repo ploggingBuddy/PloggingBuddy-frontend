@@ -34,6 +34,7 @@ function ProfileInfo() {
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
+        console.log(data);
         setUserData(data);
         setNickname(data.nickname);
         setEmail(data.email);
