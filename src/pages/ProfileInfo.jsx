@@ -16,6 +16,7 @@ function ProfileInfo() {
     async function fetchUser() {
       try {
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
