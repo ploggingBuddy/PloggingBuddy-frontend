@@ -4,7 +4,7 @@ import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
 import { data } from "react-router-dom";
 import editIcon from "../assets/edit.svg";
-import locationIcon from "../assets/location.png";
+import mapIcon from "../assets/solar_map-linear.png";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState(null);
@@ -153,14 +153,25 @@ function ProfileInfo() {
             />
             <button
               type="button"
-              className="edit-btn"
               onClick={() => setShowMapModal(true)}
-              style="width: 48px; height: 42px; border-top: 1px solid rgb(204, 204, 204); border-right: 1px solid rgb(204, 204, 204); border-bottom: 1px solid rgb(204, 204, 204); border-left: none; border-image: initial; border-top-right-radius: 6px; border-bottom-right-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0px;"
+              style={{
+                width: "48px",
+                height: "42px",
+                border: "1px solid #ccc",
+                borderLeft: "none",
+                borderTopRightRadius: "6px",
+                borderBottomRightRadius: "6px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
             >
               <img
+                src={mapIcon}
                 alt="지도 열기"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEKSURBVHgB7VTLDYJAFNwlcOKiJ34XO7EE6UDtQEuwAzvQDoQKtAO1Ar1AOHIiXABnElfxEyPRg1EneXm7+96bHRJmhfh0yCbNtm0PpJQ9rquqCvM8D1KgMSGIOiCaaZomQdTFeojso9RDDhDjJEn210N9x3GWiAWVtACeYz9C7Ji5d123UjPs8TyP9fWNQg7puj4uy7KlbkekULMtimKgFJAwjuOLL7t3dnHzK2eaeDP+hL9AqD/bqOyHSPnfHS0Xwgj08l5cK0TjxrKskbJcHbQd6ksswyiK2lmWteHrEOEbhsHa5MRTV4CGqTgbngMz5BUfhbr9HuHmtaFC0zT9o5+pPICqufgaHADfPH4RI709ugAAAABJRU5ErkJggg=="
-                style="width: 20px; height: 20px;"
+                style={{ width: "20px", height: "20px" }}
               />
             </button>
             <button
