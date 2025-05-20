@@ -38,11 +38,9 @@ function ProfileInfo() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          address: {
-            detailAddress: tempRegion,
-            latitude: coordinates.lat,
-            longitude: coordinates.lng,
-          },
+          detailAddress: tempRegion,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
         }),
       });
 
