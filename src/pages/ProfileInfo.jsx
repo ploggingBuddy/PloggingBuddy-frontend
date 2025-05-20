@@ -79,7 +79,7 @@ function ProfileInfo() {
           label="닉네임"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          onEdit={() => handleNicknameEdit(e.target.value)}
+          onEdit={(e) => handleNicknameEdit(e.target.value)}
         />
         <div>
           <label className="rg-14">이메일</label>
