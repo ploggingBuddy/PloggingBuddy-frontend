@@ -1,10 +1,8 @@
-// 📁 src/pages/CreateMeetup.js
 import React, { useState } from "react";
 import Header from "../components/Header";
 import MeetupForm from "../components/MeetupForm.jsx";
 
 const CreateMeetup = () => {
-  
   const [formData, setFormData] = useState({
     title: "",
     maxParticipants: "",
@@ -46,107 +44,105 @@ const CreateMeetup = () => {
   };
 
   const handleLocationSelect = ({ addressText, latlng }) => {
-  console.log("📍 위치 선택됨:", addressText, latlng);
-  setFormData((prev) => ({
-    ...prev,
-    location: addressText,
-    latlng,
-  }));
-};
-
-
-
-
+    console.log("📍 위치 선택됨:", addressText, latlng);
+    setFormData((prev) => ({
+      ...prev,
+      location: addressText,
+      latlng,
+    }));
+  };
 
   const isFormValid = () => {
     const { title, maxParticipants, deadline, meetupTime, latlng, description } = formData;
-    if (
-      !title.trim() ||
-      !maxParticipants.trim() ||
-      !deadline.year || !deadline.month || !deadline.day ||
-      !meetupTime.month || !meetupTime.day || !meetupTime.hour || !meetupTime.minute ||
-      !latlng ||
-      !description.trim()
-    ) {
-      return false;
-    }
-    return true;
+    return (
+      title.trim() &&
+      maxParticipants.trim() &&
+      deadline.year && deadline.month && deadline.day &&
+      meetupTime.month && meetupTime.day && meetupTime.hour && meetupTime.minute &&
+      latlng &&
+      description.trim()
+    );
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!isFormValid()) {
-    alert("필수 요소가 모두 입력되지 않았습니다.");
-    return;
-  }
-
-  const {
-    title,
-    maxParticipants,
-    deadline,
-    meetupTime,
-    latlng,
-    description,
-    location,
-  } = formData;
-
-  // 날짜 형식 조합
-  const fullDeadline = `${deadline.year}-${deadline.month.padStart(2, "0")}-${deadline.day.padStart(2, "0")}T00:00:00.000Z`;
-  const fullMeetupTime = `2025-${meetupTime.month.padStart(2, "0")}-${meetupTime.day.padStart(2, "0")}T${meetupTime.hour.padStart(2, "0")}:${meetupTime.minute.padStart(2, "0")}:00.000Z`;
-
-  const payload = {
-    member: {
-      createdAt: new Date().toISOString(),
-      lastModifiedAt: new Date().toISOString(),
-      id: 1, // 임시 값
-      username: "testuser", // 추후 로그인 사용자 정보로 교체
-      nickname: "테스트유저",
-      email: "test@example.com",
-      address: {
-        detailAddress: location,
-        latitude: latlng?.lat || 0,
-        longitude: latlng?.lng || 0,
-      },
-      profileImageUrl: "https://example.com/profile.png",
-      role: "GUEST",
-    },
-    requestBody: {
-      title,
-      content: description,
-      participantNumberMax: parseInt(maxParticipants),
-      spotName: location,
-      spotLongitude: latlng?.lng || 0,
-      spotLatitude: latlng?.lat || 0,
-      gatheringEndTime: fullDeadline,
-      gatheringTime: fullMeetupTime,
-      imageList: [], // 이미지 URL은 나중에 추가
-    },
-  };
-
-  try {
-    const res = await fetch(`${BACKEND_API_URL}/gathering/new`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ profileinfo와 동일하게
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`서버 오류: ${res.status}\n${errText}`);
+    if (!isFormValid()) {
+      alert("필수 요소가 모두 입력되지 않았습니다.");
+      return;
     }
 
-    alert("✅ 모임이 성공적으로 생성되었습니다!");
-  } catch (error) {
-    console.error("❌ 모임 생성 중 오류:", error);
-    alert("모임 생성 실패. 콘솔 확인!");
-  }
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+      return;
+    }
 
-};
+    const {
+      title,
+      maxParticipants,
+      deadline,
+      meetupTime,
+      latlng,
+      description,
+      location,
+    } = formData;
 
+    const fullDeadline = `${deadline.year}-${deadline.month.padStart(2, "0")}-${deadline.day.padStart(2, "0")}T00:00:00.000Z`;
+    const fullMeetupTime = `2025-${meetupTime.month.padStart(2, "0")}-${meetupTime.day.padStart(2, "0")}T${meetupTime.hour.padStart(2, "0")}:${meetupTime.minute.padStart(2, "0")}:00.000Z`;
+
+    const payload = {
+      member: {
+        createdAt: new Date().toISOString(),
+        lastModifiedAt: new Date().toISOString(),
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname,
+        email: user.email,
+        address: {
+          detailAddress: location || user.detailAddress,
+          latitude: latlng?.lat || user.address?.latitude || 0,
+          longitude: latlng?.lng || user.address?.longitude || 0,
+        },
+        profileImageUrl: user.profileImageUrl || "",
+        role: user.role || "GUEST",
+      },
+      requestBody: {
+        title,
+        content: description,
+        participantNumberMax: parseInt(maxParticipants),
+        spotName: location,
+        spotLongitude: latlng?.lng || 0,
+        spotLatitude: latlng?.lat || 0,
+        gatheringEndTime: fullDeadline,
+        gatheringTime: fullMeetupTime,
+        imageList: [], // 이미지 업로드 기능 연동 시 채움
+      },
+    };
+
+    console.log("📦 전송 payload:", payload);
+
+    try {
+      const res = await fetch(`${BACKEND_API_URL}/gathering/new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`서버 오류: ${res.status}\n${errText}`);
+      }
+
+      alert("✅ 모임이 성공적으로 생성되었습니다!");
+    } catch (error) {
+      console.error("❌ 모임 생성 중 오류:", error);
+      alert("모임 생성 실패. 콘솔을 확인해주세요.");
+    }
+  };
 
   return (
     <div>
