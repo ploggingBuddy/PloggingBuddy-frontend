@@ -56,6 +56,7 @@ const MeetupForm = ({
 
       {showMap && (
         <MapModal
+          key={Date.now()}
           onClose={() => setShowMap(false)} 
           onSelect={(data) => {
             handleLocationSelect(data);
