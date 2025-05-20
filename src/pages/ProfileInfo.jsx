@@ -56,12 +56,7 @@ function ProfileInfo() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          member: { data },
-          request: {
-            nickname: newNickname,
-          },
-        }),
+        body: JSON.stringify({ nickname: newNickname }),
       });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
