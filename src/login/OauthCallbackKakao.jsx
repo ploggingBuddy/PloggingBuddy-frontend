@@ -6,7 +6,6 @@ function OauthCallbackKakao() {
 
   useEffect(() => {
     const params = new URL(window.location.href).searchParams;
-    console.log(params);
     const token = params.get("code");
 
     if (token) {
