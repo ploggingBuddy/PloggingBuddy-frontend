@@ -23,30 +23,34 @@ function ProfileInfo() {
   };
 
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
-  useEffect(async () => {
-    if (!userData || isDirty) {
-      setLoading(true);
-      try {
-        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
-        const data = await res.json();
-        console.log(data);
-        setUserData(data);
-        setNickname(data.nickname);
-        setEmail(data.email);
-        setRegion(data.region);
-      } catch (e) {
-        alert(e.message);
-      } finally {
-        setLoading(false);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!userData || isDirty) {
+        setLoading(true);
+        try {
+          const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!res.ok) throw new Error("유저 정보 불러오기 실패");
+          const data = await res.json();
+          setUserData(data);
+          setNickname(data.nickname);
+          setTempNickname(data.nickname); // tempNickname도 초기화
+          setEmail(data.email);
+          setRegion(data.region);
+        } catch (e) {
+          alert(e.message);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-  }, [isDirty]);
+    };
+
+    fetchUserData();
+  }, [isDirty, token, userData, BACKEND_API_URL]);
 
   // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
   const handleNicknameEdit = async () => {
@@ -64,13 +68,16 @@ function ProfileInfo() {
         },
         body: JSON.stringify({ nickname: tempNickname }),
       });
+
       if (!res.ok) throw new Error("닉네임 변경 실패");
-      alert("닉네임이 성공적으로 변경되었습니다!");
+
+      // 상태 업데이트를 한 번에 처리
       setNickname(tempNickname);
+      setIsDirty(true);
+      alert("닉네임이 성공적으로 변경되었습니다!");
     } catch (e) {
       alert(e.message);
     }
-    setIsDirty(true);
   };
 
   // TODO: 회원 탈퇴 API 연동 (DELETE /api/user)
