@@ -1,25 +1,66 @@
 import React, { useEffect } from "react";
 
 const MapModal = ({ onClose, onSelect }) => {
+  
   useEffect(() => {
+    
     const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
-    script.async = true;
-    document.head.appendChild(script);
+    const loadScript = () =>
+      new Promise((resolve) => {
+        if (document.querySelector('script[src*="dapi.kakao.com"]')) {
+          resolve();
+        } else {
+          const script = document.createElement("script");
+          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+          script.async = true;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        }
+      });
 
-    script.onload = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(initMap);
-      }
+    const waitForKakaoReady = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          if (
+            window.kakao &&
+            window.kakao.maps &&
+            window.kakao.maps.services &&
+            window.kakao.maps.services.Geocoder
+          ) {
+            resolve();
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+
+    const waitForMapDiv = () =>
+      new Promise((resolve) => {
+        const check = () => {
+          const el = document.getElementById("map");
+          if (el && el.offsetWidth > 0 && el.offsetHeight > 0) {
+            resolve(el);
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+
+    const init = async () => {
+      await loadScript();
+      window.kakao.maps.load(async () => {
+        await waitForKakaoReady();
+        await waitForMapDiv(); // ✅ map div도 실제 화면에 렌더링된 후 실행
+        initMap();
+      });
     };
 
+    init();
+
     return () => {
-      const existing = document.querySelector('script[src*="dapi.kakao.com"]');
-      if (existing) {
-        document.head.removeChild(existing);
-      }
       const mapContainer = document.getElementById("map");
       if (mapContainer) mapContainer.innerHTML = "";
     };

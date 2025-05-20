@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import MeetupForm from "../components/MeetupForm.jsx";
 
 const CreateMeetup = () => {
+  
   const [formData, setFormData] = useState({
     title: "",
     maxParticipants: "",
@@ -48,7 +49,6 @@ const CreateMeetup = () => {
     location: addressText,
     latlng,
   }));
-  setShowMap(false); // ✅ 지도 모달 닫기
 };
 
 
@@ -86,7 +86,11 @@ const CreateMeetup = () => {
     sendData.append("maxParticipants", maxParticipants);
     sendData.append("deadline", fullDeadline);
     sendData.append("meetupTime", fullMeetupTime);
-    sendData.append("location", JSON.stringify(latlng));
+    sendData.append("location", JSON.stringify({
+      address: formData.location,
+      latlng: formData.latlng
+    }));
+
     sendData.append("description", description);
     images.forEach((img) => img && sendData.append("images", img));
 
