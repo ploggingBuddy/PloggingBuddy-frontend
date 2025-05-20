@@ -73,8 +73,8 @@ function ProfileInfo() {
           setNickname(data.nickname);
           setTempNickname(data.nickname);
           setEmail(data.email);
-          setRegion(data.region);
-          setTempRegion(data.region);
+          setRegion(data.detailAddress);
+          setTempRegion(data.detailAddress);
           // 기존 주소의 위도/경도 정보가 있다면 설정
           if (data.address) {
             setCoordinates({
@@ -154,20 +154,21 @@ function ProfileInfo() {
             <button
               type="button"
               className="edit-btn"
-              onClick={handleAddressEdit}
+              onClick={() => setShowMapModal(true)}
+              style="width: 48px; height: 42px; border-top: 1px solid rgb(204, 204, 204); border-right: 1px solid rgb(204, 204, 204); border-bottom: 1px solid rgb(204, 204, 204); border-left: none; border-image: initial; border-top-right-radius: 6px; border-bottom-right-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0px;"
             >
-              <img className="edit-icon" src={editIcon} alt="edit" />
+              <img
+                alt="지도 열기"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEKSURBVHgB7VTLDYJAFNwlcOKiJ34XO7EE6UDtQEuwAzvQDoQKtAO1Ar1AOHIiXABnElfxEyPRg1EneXm7+96bHRJmhfh0yCbNtm0PpJQ9rquqCvM8D1KgMSGIOiCaaZomQdTFeojso9RDDhDjJEn210N9x3GWiAWVtACeYz9C7Ji5d123UjPs8TyP9fWNQg7puj4uy7KlbkekULMtimKgFJAwjuOLL7t3dnHzK2eaeDP+hL9AqD/bqOyHSPnfHS0Xwgj08l5cK0TjxrKskbJcHbQd6ksswyiK2lmWteHrEOEbhsHa5MRTV4CGqTgbngMz5BUfhbr9HuHmtaFC0zT9o5+pPICqufgaHADfPH4RI709ugAAAABJRU5ErkJggg=="
+                style="width: 20px; height: 20px;"
+              />
             </button>
             <button
               type="button"
               className="edit-btn"
-              onClick={() => setShowMapModal(true)}
+              onClick={handleAddressEdit}
             >
-              <img
-                className="location-icon"
-                src={locationIcon}
-                alt="location"
-              />
+              <img className="edit-icon" src={editIcon} alt="edit" />
             </button>
           </div>
         </div>
