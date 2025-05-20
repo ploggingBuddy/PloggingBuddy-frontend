@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import editIcon from "../assets/edit.svg";
 
 function ProfileField({
@@ -8,18 +9,27 @@ function ProfileField({
   editable = true,
   inputClass = "",
 }) {
+  const inputRef = useRef(null);
+
+  const handleEdit = () => {
+    if (inputRef.current) {
+      onEdit(inputRef.current.value);
+    }
+  };
+
   return (
     <div>
       <label className="rg-14">{label}</label>
       <div className="profile-field--input">
         <input
+          ref={inputRef}
           className={`rg-14 ${inputClass}`}
           value={value}
           onChange={onChange}
           disabled={!editable}
         />
         {onEdit && (
-          <button className="edit-btn" onClick={onEdit}>
+          <button className="edit-btn" onClick={handleEdit}>
             <img className="edit-icon" src={editIcon} alt="edit" />
           </button>
         )}
