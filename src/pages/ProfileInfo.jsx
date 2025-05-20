@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
+import { data } from "react-router-dom";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState(null);
@@ -54,11 +55,16 @@ function ProfileInfo() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ request: { nickname: newNickname } }),
+        body: JSON.stringify({
+          member: { data },
+          request: {
+            nickname: newNickname,
+          },
+        }),
       });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
-      // 필요하다면 setNickname(newNickname) 등으로 상태도 갱신
+      setNickname(newNickname);
     } catch (e) {
       alert(e.message);
     }
