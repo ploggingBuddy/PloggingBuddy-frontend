@@ -4,7 +4,7 @@ import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
 import { data } from "react-router-dom";
 import editIcon from "../assets/edit.svg";
-import locationIcon from "../assets/location.png";
+import mapIcon from "../assets/solar_map-linear.png";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState(null);
@@ -73,8 +73,8 @@ function ProfileInfo() {
           setNickname(data.nickname);
           setTempNickname(data.nickname);
           setEmail(data.email);
-          setRegion(data.region);
-          setTempRegion(data.region);
+          setRegion(data.detailAddress);
+          setTempRegion(data.detailAddress);
           // 기존 주소의 위도/경도 정보가 있다면 설정
           if (data.address) {
             setCoordinates({
@@ -153,21 +153,33 @@ function ProfileInfo() {
             />
             <button
               type="button"
-              className="edit-btn"
-              onClick={handleAddressEdit}
+              onClick={() => setShowMapModal(true)}
+              style={{
+                width: "48px",
+                height: "42px",
+                border: "1px solid #ccc",
+                borderLeft: "none",
+                borderTopRightRadius: "6px",
+                borderBottomRightRadius: "6px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+              }}
             >
-              <img className="edit-icon" src={editIcon} alt="edit" />
+              <img
+                src={mapIcon}
+                alt="지도 열기"
+                style={{ width: "20px", height: "20px" }}
+              />
             </button>
             <button
               type="button"
               className="edit-btn"
-              onClick={() => setShowMapModal(true)}
+              onClick={handleAddressEdit}
             >
-              <img
-                className="location-icon"
-                src={locationIcon}
-                alt="location"
-              />
+              <img className="edit-icon" src={editIcon} alt="edit" />
             </button>
           </div>
         </div>
