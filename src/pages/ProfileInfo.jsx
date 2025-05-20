@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
+import MapModal from "../components/MapModal";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState("example_name");
   const [email, setEmail] = useState("example_name");
   const [region, setRegion] = useState("example_name");
   const [loading, setLoading] = useState(true);
+  const [showMapModal, setShowMapModal] = useState(false); //지도 모달 상태
 
   const token = localStorage.getItem("kakao_token");
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
+
+  const handleMapSelect = ({ addressText }) => {
+  setRegion(addressText); // 주소만 사용
+  setShowMapModal(false);
+};
+
+
 
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
   useEffect(() => {
@@ -78,13 +87,21 @@ function ProfileInfo() {
           label="지역 정보"
           value={region}
           onChange={(e) => setRegion(e.target.value)}
-          onEdit={() => handleEdit("지역 정보")}
+          onEdit={() => setShowMapModal(true)}
         />
       </div>
 
       <button className="withdraw-btn " onClick={handleWithdraw}>
         <span className="sb-14">회원 탈퇴</span>
       </button>
+
+      {/*지도 모달 연결 */}
+      {showMapModal && (
+        <MapModal
+          onClose={() => setShowMapModal(false)}
+          onSelect={handleMapSelect}
+        />
+      )}
     </div>
   );
 }

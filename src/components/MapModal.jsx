@@ -2,39 +2,62 @@ import React, { useEffect } from "react";
 
 const MapModal = ({ onClose, onSelect }) => {
   useEffect(() => {
-    const script = document.createElement("script");
-
     const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
-    //kakao API
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
+
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
     script.async = true;
     document.head.appendChild(script);
 
     script.onload = () => {
-      window.kakao.maps.load(() => {
-        const container = document.getElementById("map");
-        const options = {
-          center: new window.kakao.maps.LatLng(37.5665, 126.978),
-          level: 3,
-        };
-        const map = new window.kakao.maps.Map(container, options);
-
-        window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
-          const latlng = mouseEvent.latLng;
-          const result = `위도: ${latlng.getLat()}, 경도: ${latlng.getLng()}`;
-
-          // 부모 컴포넌트로 전달
-          onSelect(result);
-          onClose(); // 모달 닫기
-        });
-      });
+      if (window.kakao && window.kakao.maps) {
+        window.kakao.maps.load(initMap);
+      }
     };
 
     return () => {
       const existing = document.querySelector('script[src*="dapi.kakao.com"]');
-      if (existing) document.head.removeChild(existing);
+      if (existing) {
+        document.head.removeChild(existing);
+      }
+      const mapContainer = document.getElementById("map");
+      if (mapContainer) mapContainer.innerHTML = "";
     };
-  }, [onSelect, onClose]);
+  }, []);
+
+  const initMap = () => {
+    const container = document.getElementById("map");
+    if (!container) return;
+
+    const options = {
+      center: new window.kakao.maps.LatLng(37.5665, 126.978),
+      level: 3,
+    };
+
+    const map = new window.kakao.maps.Map(container, options);
+    const geocoder = new window.kakao.maps.services.Geocoder();
+
+    window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
+      const lat = mouseEvent.latLng.getLat();
+      const lng = mouseEvent.latLng.getLng();
+
+      geocoder.coord2Address(lng, lat, (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const address = result[0].address.address_name;
+          console.log("📍 선택된 주소:", address);
+
+          onSelect({
+            latlng: { lat, lng },
+            addressText: address,
+          });
+
+          onClose();
+        } else {
+          alert("주소를 불러올 수 없습니다.");
+        }
+      });
+    });
+  };
 
   return (
     <div
@@ -68,7 +91,6 @@ const MapModal = ({ onClose, onSelect }) => {
             padding: "12px 20px",
             display: "flex",
             justifyContent: "flex-end",
-            marginTop: "2px", 
           }}
         >
           <button
@@ -78,14 +100,13 @@ const MapModal = ({ onClose, onSelect }) => {
               color: "white",
               padding: "8px 16px",
               border: "none",
-              borderRadius: "6px", //
+              borderRadius: "6px",
               cursor: "pointer",
             }}
           >
             닫기
           </button>
         </div>
-
       </div>
     </div>
   );

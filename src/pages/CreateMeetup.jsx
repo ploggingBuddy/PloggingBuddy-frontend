@@ -8,20 +8,19 @@ const CreateMeetup = () => {
     title: "",
     maxParticipants: "",
     deadline: { year: "", month: "", day: "" },
+    meetupTime: { month: "", day: "", hour: "", minute: "" },
     images: [],
-    location: "", // 화면에 보일 주소 or 위도경도
-    latlng: null, // 실제 저장할 좌표 (추가)
+    location: "",
+    latlng: null,
     description: "",
   });
 
   const [showMap, setShowMap] = useState(false);
 
-  // 일반 입력 핸들링 (title, location 등)
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  // 모집 마감일 입력 핸들링 (year, month, day)
   const handleDeadlineChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -29,43 +28,73 @@ const CreateMeetup = () => {
     }));
   };
 
-  // 이미지 파일 변경 핸들링
+  const handleTimeChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      meetupTime: { ...prev.meetupTime, [field]: value },
+    }));
+  };
+
   const handleImageChange = (index, file) => {
     const updated = [...formData.images];
     updated[index] = file;
     setFormData((prev) => ({ ...prev, images: updated }));
   };
 
-  // 지도에서 위치 선택한 결과 처리
   const handleLocationSelect = ({ addressText, latlng }) => {
-    setFormData((prev) => ({
-      ...prev,
-      location: addressText, // 사용자에게 보일 주소
-      latlng: latlng, // 실제 저장할 좌표
-    }));
+  console.log("📍 위치 선택됨:", addressText, latlng);
+  setFormData((prev) => ({
+    ...prev,
+    location: addressText,
+    latlng,
+  }));
+  setShowMap(false); // ✅ 지도 모달 닫기
+};
+
+
+
+
+
+  const isFormValid = () => {
+    const { title, maxParticipants, deadline, meetupTime, latlng, description } = formData;
+    if (
+      !title.trim() ||
+      !maxParticipants.trim() ||
+      !deadline.year || !deadline.month || !deadline.day ||
+      !meetupTime.month || !meetupTime.day || !meetupTime.hour || !meetupTime.minute ||
+      !latlng ||
+      !description.trim()
+    ) {
+      return false;
+    }
+    return true;
   };
 
-  // 최종 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { title, maxParticipants, deadline, latlng, description, images } =
-      formData;
+    if (!isFormValid()) {
+      alert("필수 요소가 모두 입력되지 않았습니다.");
+      return;
+    }
+
+    const { title, maxParticipants, deadline, meetupTime, latlng, description, images } = formData;
     const fullDeadline = `${deadline.year}-${deadline.month}-${deadline.day}`;
+    const fullMeetupTime = `${meetupTime.month}-${meetupTime.day} ${meetupTime.hour}:${meetupTime.minute}`;
 
     const sendData = new FormData();
     sendData.append("title", title);
     sendData.append("maxParticipants", maxParticipants);
     sendData.append("deadline", fullDeadline);
-    sendData.append("location", JSON.stringify(latlng)); // 위도경도만 전송
+    sendData.append("meetupTime", fullMeetupTime);
+    sendData.append("location", JSON.stringify(latlng));
     sendData.append("description", description);
     images.forEach((img) => img && sendData.append("images", img));
 
-    // 전송 확인용 콘솔 출력
     for (let [key, value] of sendData.entries()) {
       console.log(key, value);
     }
 
-    alert("데이터 준비 완료! (백엔드 연동 시 바로 전송 가능)");
+    alert("데이터 준비 완료! (백엔드 연동 시 전송 가능)");
   };
 
   return (
@@ -76,9 +105,10 @@ const CreateMeetup = () => {
         setShowMap={setShowMap}
         handleChange={handleChange}
         handleDeadlineChange={handleDeadlineChange}
+        handleTimeChange={handleTimeChange}
         handleImageChange={handleImageChange}
         handleSubmit={handleSubmit}
-        handleLocationSelect={handleLocationSelect} // 지도에서 위치 선택 시 호출
+        handleLocationSelect={handleLocationSelect}
       />
     </div>
   );

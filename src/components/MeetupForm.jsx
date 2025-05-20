@@ -5,6 +5,7 @@ import DeadlineInput from "./DeadlineInput.jsx";
 import ImageUpload from "./ImageUpload.jsx";
 import LocationInput from "./LocationInput.jsx";
 import DescriptionInput from "./DescriptionInput.jsx";
+import MeetupTimeInput from "./MeetupTimeInput.jsx";
 import MapModal from "./MapModal.jsx";
 
 const MeetupForm = ({
@@ -13,8 +14,10 @@ const MeetupForm = ({
   setShowMap,
   handleChange,
   handleDeadlineChange,
+  handleTimeChange,
   handleImageChange,
   handleSubmit,
+  handleLocationSelect
 }) => (
   <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
     <form onSubmit={handleSubmit}>
@@ -40,18 +43,24 @@ const MeetupForm = ({
           deadline={formData.deadline}
           onChange={handleDeadlineChange}
         />
-        <ImageUpload images={formData.images} onChange={handleImageChange} />
         <LocationInput
           location={formData.location}
           onChange={(e) => handleChange("location", e.target.value)}
           onMapToggle={() => setShowMap(true)}
         />
+        <MeetupTimeInput
+          meetupTime={formData.meetupTime}
+          onChange={handleTimeChange}
+        />
       </div>
 
       {showMap && (
         <MapModal
-          onClose={() => setShowMap(false)}
-          onSelect={(loc) => handleChange("location", loc)}
+          onClose={() => setShowMap(false)} 
+          onSelect={(data) => {
+            handleLocationSelect(data);
+            setShowMap(false);
+          }}
         />
       )}
 
@@ -60,19 +69,25 @@ const MeetupForm = ({
         onChange={(e) => handleChange("description", e.target.value)}
       />
 
-      <button
-        type="submit"
-        style={{
-          backgroundColor: "#6DBE45",
-          color: "white",
-          padding: "10px 20px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        + 모임 생성하기
-      </button>
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-end", marginTop: "20px" }}>
+        <div style={{ flex: 1 }}>
+          <ImageUpload images={formData.images} onChange={handleImageChange} />
+        </div>
+        <button
+          type="submit"
+          style={{
+            backgroundColor: "#6DBE45",
+            color: "white",
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            height: "fit-content"
+          }}
+        >
+          + 모임 생성하기
+        </button>
+      </div>
     </form>
   </div>
 );
