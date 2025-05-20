@@ -88,6 +88,7 @@ function ProfileInfo() {
           alert(e.message);
         } finally {
           setLoading(false);
+          setIsDirty(false);
         }
       }
     };
