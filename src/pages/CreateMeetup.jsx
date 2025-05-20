@@ -16,6 +16,14 @@ const CreateMeetup = () => {
 
   const [showMap, setShowMap] = useState(false);
 
+   useEffect(() => {
+    const hasReloaded = sessionStorage.getItem("createMeetupReloaded");
+    if (!hasReloaded) {
+      sessionStorage.setItem("createMeetupReloaded", "true");
+      window.location.reload();
+    }
+  }, []);
+
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
   const token = localStorage.getItem("kakao_token");
 
