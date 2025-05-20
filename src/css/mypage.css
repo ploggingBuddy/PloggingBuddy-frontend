@@ -65,12 +65,12 @@
   flex-direction: column;
   justify-content: space-between;
   width: 392px;
-  height: 285px;
 }
 .profile-fields > div {
   display: flex;
   flex-direction: column;
   height: 54px;
+  margin-top: 24px;
 }
 .profile-fields label {
   color: var(--gray200);
