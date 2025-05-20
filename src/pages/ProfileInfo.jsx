@@ -6,6 +6,7 @@ import { data } from "react-router-dom";
 
 function ProfileInfo() {
   const [nickname, setNickname] = useState(null);
+  const [tempNickname, setTempNickname] = useState(null); // 임시 닉네임 상태 추가
   const [email, setEmail] = useState(null);
   const [region, setRegion] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -48,7 +49,12 @@ function ProfileInfo() {
   }, [isDirty]);
 
   // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
-  const handleNicknameEdit = async (newNickname) => {
+  const handleNicknameEdit = async () => {
+    if (!tempNickname) {
+      alert("닉네임을 입력해주세요.");
+      return;
+    }
+
     try {
       const res = await fetch(`${BACKEND_API_URL}/member/nickname`, {
         method: "POST",
@@ -58,13 +64,13 @@ function ProfileInfo() {
         },
         body: JSON.stringify({
           request: {
-            nickname: newNickname,
+            nickname: tempNickname,
           },
         }),
       });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
-      setNickname(newNickname);
+      setNickname(tempNickname);
     } catch (e) {
       alert(e.message);
     }
@@ -83,9 +89,9 @@ function ProfileInfo() {
       <div className="profile-fields">
         <ProfileField
           label="닉네임"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          onEdit={() => handleNicknameEdit()}
+          value={tempNickname ?? nickname}
+          onChange={(e) => setTempNickname(e.target.value)}
+          onEdit={handleNicknameEdit}
         />
         <div>
           <label className="rg-14">이메일</label>
