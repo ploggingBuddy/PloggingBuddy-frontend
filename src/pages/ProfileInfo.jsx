@@ -14,11 +14,9 @@ function ProfileInfo() {
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleMapSelect = ({ addressText }) => {
-  setRegion(addressText); // 주소만 사용
-  setShowMapModal(false);
-};
-
-
+    setRegion(addressText); // 주소만 사용
+    setShowMapModal(false);
+  };
 
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
   useEffect(() => {
@@ -33,6 +31,9 @@ function ProfileInfo() {
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         console.log(data);
+        setNickname(data.nickname);
+        setEmail(data.email);
+        setRegion(data.region);
       } catch (e) {
         alert(e.message);
       } finally {
