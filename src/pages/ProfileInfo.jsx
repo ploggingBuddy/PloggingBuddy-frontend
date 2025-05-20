@@ -4,10 +4,12 @@ import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
 
 function ProfileInfo() {
-  const [nickname, setNickname] = useState("example_name");
-  const [email, setEmail] = useState("example_name");
-  const [region, setRegion] = useState("example_name");
+  const [nickname, setNickname] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [region, setRegion] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDirty, setIsDirty] = useState(false); // 수정 시 true
   const [showMapModal, setShowMapModal] = useState(false); //지도 모달 상태
 
   const token = localStorage.getItem("kakao_token");
@@ -19,8 +21,9 @@ function ProfileInfo() {
   };
 
   // ✅ 유저 정보 불러오기  (GET /api/member/me)
-  useEffect(() => {
-    async function fetchUser() {
+  useEffect(async () => {
+    if (!userData || isDirty) {
+      setLoading(true);
       try {
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
           method: "GET",
@@ -30,7 +33,7 @@ function ProfileInfo() {
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
-        console.log(data);
+        setUserData(data);
         setNickname(data.nickname);
         setEmail(data.email);
         setRegion(data.region);
@@ -40,8 +43,7 @@ function ProfileInfo() {
         setLoading(false);
       }
     }
-    fetchUser();
-  }, []);
+  }, [isDirty]);
 
   // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
   const handleNicknameEdit = async (newNickname) => {
@@ -60,6 +62,7 @@ function ProfileInfo() {
     } catch (e) {
       alert(e.message);
     }
+    setIsDirty(true);
   };
 
   // TODO: 회원 탈퇴 API 연동 (DELETE /api/user)
