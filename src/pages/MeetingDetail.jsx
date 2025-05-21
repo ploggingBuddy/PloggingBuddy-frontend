@@ -82,6 +82,7 @@ function MeetingDetail() {
   const handleJoinMeeting = async () => {
     if (!meeting) return;
     const token = localStorage.getItem("kakao_token");
+    setLoading(true);
 
     try {
       // 먼저 사용자 정보를 확인
@@ -164,6 +165,9 @@ function MeetingDetail() {
       }
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
+      navigate("/mypage");
     }
   };
 
