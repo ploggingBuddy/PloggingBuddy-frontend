@@ -198,36 +198,6 @@ function MeetingDetail() {
               {meeting.content || "모임 설명이 없습니다."}
             </p>
           </div>
-          <div className="meeting-image-section">
-            {meeting.images ? (
-              <div className="image-container">
-                {meeting.images.map((image, index) => (
-                  <div key={index} className="image-wrapper">
-                    <img
-                      src={image}
-                      alt={`${meeting.title} 이미지 ${index + 1}`}
-                    />
-                    {/* 모임 생성자인 경우에만 이미지 변경 버튼 표시 */}
-                    {isCreator && (
-                      <button
-                        className="change-image-btn"
-                        onClick={() => {
-                          // TODO: 이미지 변경 로직 구현
-                          console.log(`이미지 ${index + 1} 변경`);
-                        }}
-                      >
-                        이미지 변경
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="image-placeholder">
-                <span>이미지 없음</span>
-              </div>
-            )}
-          </div>
           {/* 모임 생성자가 아닌 경우에만 참여하기 버튼 표시 */}
           {!isCreator && (
             <button

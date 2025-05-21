@@ -26,6 +26,7 @@ function MeetingCard({
         <div className={`meeting-status ${statusClass} rg-12`}>
           {postStatus === "GATHERING_CONFIRMED" ? "모집 완료" : "모집 중"}
         </div>
+        {/* <span className="rg-14">생성자: {leadUserNickname}</span> */}
         <span className="rg-14">
           현재 참여 인원: {participantCurrentNumber}/{participantMaxNumber}명
         </span>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProfileInfo from "./ProfileInfo";
 import MeetingCardList from "../components/MeetingCardList";
+import AddressPopup from "../components/AddressPopup";
 import "../css/mypage.css";
 
 function ActivityTab({ tab, setTab }) {
@@ -26,6 +27,7 @@ function MyPage() {
   const [tab, setTab] = useState("profile");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAddressPopup, setShowAddressPopup] = useState(false);
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -42,6 +44,11 @@ function MyPage() {
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         setUserData(data);
+
+        // 주소 정보가 없고 팝업이 닫혀있지 않은 경우 팝업 표시
+        if (!data.address && !localStorage.getItem("addressPopupClosed")) {
+          setShowAddressPopup(true);
+        }
       } catch (e) {
         alert(e.message);
       } finally {
@@ -52,10 +59,21 @@ function MyPage() {
     fetchUserData();
   }, [BACKEND_API_URL]);
 
+  const handleClosePopup = () => {
+    setShowAddressPopup(false);
+    // 24시간 동안 팝업을 다시 표시하지 않음
+    localStorage.setItem("addressPopupClosed", "true");
+    // 24시간 후에 팝업 표시 가능하도록 설정
+    setTimeout(() => {
+      localStorage.removeItem("addressPopupClosed");
+    }, 24 * 60 * 60 * 1000);
+  };
+
   if (loading) return <div>로딩 중...</div>;
 
   return (
     <div className="mypage-bg">
+      {showAddressPopup && <AddressPopup onClose={handleClosePopup} />}
       <div className="mypage-container">
         <ActivityTab tab={tab} setTab={setTab} />
         {tab === "profile" ? (
