@@ -5,7 +5,7 @@ import MapModal from "../components/MapModal";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
-function ProfileInfo({ ...userData }) {
+function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
@@ -39,7 +39,11 @@ function ProfileInfo({ ...userData }) {
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
-        userData = data;
+        console.log(data);
+        nickname = data.nickname;
+        email = data.email;
+        address = data.address;
+        profileImage = data.profileImageUrl;
         setTempNickname(data.nickname);
         setTempRegion(data.detailAddress);
         if (data.address) {
@@ -80,6 +84,7 @@ function ProfileInfo({ ...userData }) {
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
       setIsDirty(true);
+      onUpdate();
     } catch (e) {
       alert(e.message);
     }
@@ -103,6 +108,7 @@ function ProfileInfo({ ...userData }) {
       if (!res.ok) throw new Error("지역 정보 변경 실패");
       alert("지역 정보가 성공적으로 변경되었습니다!");
       setIsDirty(true);
+      onUpdate();
     } catch (e) {
       alert(e.message);
     }
@@ -122,28 +128,28 @@ function ProfileInfo({ ...userData }) {
   return (
     <div className="profile-info">
       <img
-        src={userData?.profileImageUrl ?? profileDefault}
+        src={profileImage ?? profileDefault}
         alt="프로필"
         className="profile-img"
       />
       <div className="profile-fields">
         <ProfileField
           label="닉네임"
-          value={tempNickname ?? userData?.nickname}
+          value={tempNickname ?? nickname}
           onChange={(e) => setTempNickname(e.target.value)}
           onEdit={handleNicknameEdit}
         />
         <div>
           <label className="rg-14">이메일</label>
           <div>
-            <span className="rg-14">{userData?.email}</span>
+            <span className="rg-14">{email}</span>
           </div>
         </div>
         <div>
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={tempRegion ?? userData?.detailAddress}
+              value={tempRegion ?? address?.detailAddress}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
