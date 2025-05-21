@@ -43,11 +43,9 @@
 
 .max-participants-control {
   display: flex;
-  flex-direction: column;
   gap: 12px;
   padding: 16px;
   background-color: var(--gray100);
-  border-radius: 8px;
 }
 
 .range-container {
@@ -88,22 +86,23 @@
 }
 
 .change-max-btn {
-  align-self: flex-end;
-  padding: 8px 16px;
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
+  display: inline-flex;
+  padding: 4px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--white);
   border-radius: 4px;
+  border: 1px solid var(--gray200);
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .change-max-btn:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--gray50);
 }
 
 .change-max-btn:disabled {
-  background-color: var(--gray300);
+  background-color: var(--gray100);
   cursor: not-allowed;
 }
 
