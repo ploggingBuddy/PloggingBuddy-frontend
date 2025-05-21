@@ -42,6 +42,7 @@ function MyPage() {
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         setUserData(data);
+        console.log(data);
       } catch (e) {
         alert(e.message);
       } finally {

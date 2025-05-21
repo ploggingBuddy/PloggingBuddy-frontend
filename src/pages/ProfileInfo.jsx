@@ -6,7 +6,6 @@ import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
 function ProfileInfo({ ...userData }) {
-  console.log(userData);
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
