@@ -6,7 +6,7 @@ function MeetingCardList({ meetings }) {
       <span className="sb-14">{meetings.gatheringName}</span>
       <div className="card-list-row">
         {meetings.map((meeting) => (
-          <MeetingCard key={postId} {...meeting} />
+          <MeetingCard key={meeting.postId} {...meeting} />
         ))}
       </div>
     </div>
