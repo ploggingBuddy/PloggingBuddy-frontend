@@ -5,25 +5,11 @@ import MapModal from "../components/MapModal";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
-function ProfileInfo({
-  nickname: initialNickname,
-  email: initialEmail,
-  address: initialAddress,
-  profileImage: initialProfileImage,
-  onUpdate,
-}) {
-  const [loading, setLoading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
+function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   const [showMapModal, setShowMapModal] = useState(false);
-  const [tempNickname, setTempNickname] = useState(initialNickname);
-  const [tempRegion, setTempRegion] = useState(initialAddress);
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
-  const [userData, setUserData] = useState({
-    nickname: initialNickname,
-    email: initialEmail,
-    address: initialAddress,
-    profileImage: initialProfileImage,
-  });
+  const nicknameRef = useRef(null);
+  const addressRef = useRef(null);
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -33,63 +19,9 @@ function ProfileInfo({
     setShowMapModal(false);
   };
 
-  // props가 변경될 때 state 업데이트
-  useEffect(() => {
-    setUserData({
-      nickname: initialNickname,
-      email: initialEmail,
-      address: initialAddress,
-      profileImage: initialProfileImage,
-    });
-    setTempNickname(initialNickname);
-    setTempRegion(initialAddress);
-  }, [initialNickname, initialEmail, initialAddress, initialProfileImage]);
-
-  // 유저 정보 불러오기
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("kakao_token");
-      setLoading(true);
-      try {
-        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
-        const data = await res.json();
-        console.log(data);
-        setUserData({
-          nickname: data.nickname,
-          email: data.email,
-          address: data.detailAddress,
-          profileImage: data.profileImageUrl,
-        });
-        setTempNickname(data.nickname);
-        setTempRegion(data.detailAddress);
-        if (data.address) {
-          setCoordinates({
-            lat: data.address.latitude || 0,
-            lng: data.address.longitude || 0,
-          });
-        }
-      } catch (e) {
-        alert(e.message);
-      } finally {
-        console.log(`user token: ${token}`);
-        setLoading(false);
-        setIsDirty(false);
-      }
-    };
-    if (isDirty) {
-      fetchUserData();
-    }
-  }, [isDirty, BACKEND_API_URL]);
-
   const handleNicknameEdit = async () => {
     const token = localStorage.getItem("kakao_token");
-    if (!tempNickname) {
+    if (!nicknameRef.current.value) {
       alert("닉네임을 입력해주세요.");
       return;
     }
@@ -101,11 +33,10 @@ function ProfileInfo({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ nickname: tempNickname }),
+        body: JSON.stringify({ nickname: nicknameRef.current.value }),
       });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
-      setIsDirty(true);
       onUpdate();
     } catch (e) {
       alert(e.message);
@@ -122,14 +53,13 @@ function ProfileInfo({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          detailAddress: tempRegion,
+          detailAddress: addressRef.current.value,
           latitude: coordinates.lat,
           longitude: coordinates.lng,
         }),
       });
       if (!res.ok) throw new Error("지역 정보 변경 실패");
       alert("지역 정보가 성공적으로 변경되었습니다!");
-      setIsDirty(true);
       onUpdate();
     } catch (e) {
       alert(e.message);
@@ -156,8 +86,9 @@ function ProfileInfo({
       />
       <div className="profile-fields">
         <ProfileField
+          ref={nicknameRef}
           label="닉네임"
-          value={tempNickname ?? userData.nickname}
+          value={userData.nickname}
           onChange={(e) => setTempNickname(e.target.value)}
           onEdit={handleNicknameEdit}
         />
@@ -171,7 +102,8 @@ function ProfileInfo({
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={tempRegion ?? userData.address}
+              ref={addressRef}
+              value={userData.address}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
