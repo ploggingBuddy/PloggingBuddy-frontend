@@ -31,7 +31,6 @@ function ProfileInfo() {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        console.log("Request headers:", headers); // 요청 헤더 확인
 
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
           method: "GET",
