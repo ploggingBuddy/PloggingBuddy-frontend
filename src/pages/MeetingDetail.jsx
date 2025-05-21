@@ -11,6 +11,7 @@ function MeetingDetail() {
   const [currentParticipants, setCurrentParticipants] = useState(0);
   const [isCreator, setIsCreator] = useState(false);
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const maxParticipantsInputRef = useRef(null);
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -150,6 +151,34 @@ function MeetingDetail() {
     }
   };
 
+  const handleChangeMaxParticipants = async () => {
+    if (!meeting) return;
+    const token = localStorage.getItem("kakao_token");
+
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/gathering/update`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: meeting.postId,
+          maxParticipants: maxParticipantsInputRef.current.value,
+          imageList: [],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("인원 변경에 실패했습니다.");
+      }
+
+      alert("인원 변경이 완료되었습니다.");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="meeting-detail-wrapper">
       <div className="meeting-detail-container">
@@ -181,6 +210,7 @@ function MeetingDetail() {
               <div className="info-item">
                 <div className="max-participants-control">
                   <input
+                    ref={maxParticipantsInputRef}
                     type="range"
                     min={meeting.currentParticipants}
                     max={10}
@@ -191,14 +221,15 @@ function MeetingDetail() {
                         to right,
                         var(--primary) 0%,
                         var(--primary) ${
-                          ((participantMaxNumber -
+                          ((meeting.maxParticipants -
                             meeting.currentParticipants) /
                             (meeting.maxParticipants -
                               meeting.currentParticipants)) *
                           100
                         }%,
                         var(--gray200) ${
-                          ((maxParticipants - meeting.currentParticipants) /
+                          ((meeting.maxParticipants -
+                            meeting.currentParticipants) /
                             (meeting.maxParticipants -
                               meeting.currentParticipants)) *
                           100
@@ -210,7 +241,10 @@ function MeetingDetail() {
                   <span className="max-participants-value sb-14">
                     {maxParticipants}명
                   </span>
-                  <button className="change-max-btn">
+                  <button
+                    className="change-max-btn"
+                    onClick={handleChangeMaxParticipants}
+                  >
                     <span className="sb-14">인원 변경</span>
                   </button>
                 </div>
