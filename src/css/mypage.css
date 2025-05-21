@@ -114,6 +114,18 @@
   margin-top: 32px;
 }
 
+.map-btn {
+  background-color: var(--white);
+  width: 24px;
+  height: 24px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
 /* =========================
    활동 기록
    ========================= */

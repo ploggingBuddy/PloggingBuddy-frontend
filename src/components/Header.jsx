@@ -10,12 +10,9 @@ import "../css/typography.css";
 function Header({ onMeetingClick }) {
   return (
     <header>
-      <img
-        className="logo"
-        src={logo}
-        alt="로고"
-        onClick={() => navigate("/")}
-      />
+      <a href="/">
+        <img className="logo" src={logo} alt="로고" />
+      </a>
       <div className="header-menu">
         <div>
           <a className="sb-14" href="/main">

@@ -16,12 +16,6 @@ function ProfileInfo() {
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
-  const handleTokenExpired = () => {
-    localStorage.removeItem("kakao_token");
-    alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-    navigate("/login");
-  };
-
   const handleMapSelect = ({ latlng, addressText }) => {
     setTempRegion(addressText);
     setCoordinates(latlng);
@@ -59,6 +53,7 @@ function ProfileInfo() {
       } catch (e) {
         alert(e.message);
       } finally {
+        console.log(`user token: ${token}`);
         setLoading(false);
         setIsDirty(false);
       }
@@ -118,7 +113,12 @@ function ProfileInfo() {
     alert("정말로 회원을 탈퇴하시겠습니까?");
   };
 
-  if (loading) return <div>로딩 중...</div>;
+  if (loading)
+    return (
+      <div>
+        <div>로딩 중...</div>
+      </div>
+    );
 
   return (
     <div className="profile-info">
@@ -150,23 +150,9 @@ function ProfileInfo() {
             <button
               type="button"
               onClick={() => setShowMapModal(true)}
-              style={{
-                backgroundColor: "white",
-                width: "48px",
-                height: "42px",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 0,
-              }}
+              className="map-btn"
             >
-              <img
-                src={mapIcon}
-                alt="지도 열기"
-                style={{ width: "20px", height: "20px" }}
-              />
+              <img src={mapIcon} alt="지도 열기" />
             </button>
             <button
               type="button"
