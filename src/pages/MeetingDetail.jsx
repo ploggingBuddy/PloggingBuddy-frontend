@@ -74,14 +74,18 @@ function MeetingDetail() {
         <main className="meeting-content">
           {/* 상태 뱃지 */}
           <div className={`meeting-status ${statusClass} rg-12`}>
-            {meeting.gatheringStatus}
+            {meeting.gatheringStatus === "GATHERING_CONFIRMED"
+              ? "모집 완료"
+              : meeting.gatheringStatus === "GATHERING_PENDING"
+              ? "모집 진행중"
+              : "모집 마감 보류"}
           </div>
           {/* 상세 정보 */}
           <div className="meeting-info">
             <div className="info-item">
               <span className="label rg-14">참여 인원</span>
               <span className="value sb-14">
-                {meeting.currentParticipants} / {meeting.maxParticipants}명
+                {meeting.currentParticipants} / {meeting.participantMaxNumber}명
               </span>
             </div>
 
@@ -93,14 +97,15 @@ function MeetingDetail() {
                     type="range"
                     min={meeting.currentParticipants}
                     max={10}
-                    value={maxParticipants}
+                    value={meeting.participantMaxNumber}
                     className="max-participants-range"
                     style={{
                       background: `linear-gradient(
                         to right,
                         var(--primary) 0%,
                         var(--primary) ${
-                          ((maxParticipants - meeting.currentParticipants) /
+                          ((participantMaxNumber -
+                            meeting.currentParticipants) /
                             (meeting.maxParticipants -
                               meeting.currentParticipants)) *
                           100
@@ -127,13 +132,11 @@ function MeetingDetail() {
 
             <div className="info-item">
               <span className="label rg-14">모집 기간</span>
-              <span className="value sb-14">
-                {meeting.gatheringStartTime} ~ {meeting.gatheringEndTime}
-              </span>
+              <span className="value sb-14">{meeting.gatheringEndTime}</span>
             </div>
             <div className="info-item">
               <span className="label rg-14">모임 장소</span>
-              <span className="value sb-14">{meeting.detailAddress}</span>
+              <span className="value sb-14">{meeting.address}</span>
             </div>
           </div>
           <div className="meeting-description">
@@ -141,7 +144,6 @@ function MeetingDetail() {
               {meeting.content || "모임 설명이 없습니다."}
             </p>
           </div>
-          이미지 섹션
           <div className="meeting-image-section">
             {meeting.images ? (
               <div className="image-container">
