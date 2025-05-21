@@ -59,7 +59,6 @@ function MeetingDetail() {
   }, [id, navigate, BACKEND_API_URL]);
 
   if (error) return <div className="error">{error}</div>;
-  if (!meeting) return <div className="error">모임을 찾을 수 없습니다.</div>;
 
   // meeting이 있을 때만 statusClass 계산
   const statusClass =
@@ -123,7 +122,7 @@ function MeetingDetail() {
         setMeeting(updatedData);
 
         // 마지막 참가자인 경우 모임 상태 변경
-        if (updatedData.currentParticipants > 0) {
+        if (true) {
           const finishResponse = await fetch(
             `${BACKEND_API_URL}/gathering/gathering-finish/${id}`,
             {

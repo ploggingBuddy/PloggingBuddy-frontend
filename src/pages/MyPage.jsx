@@ -77,19 +77,19 @@ function MyPage() {
           />
         ) : (
           <div className="meeting-card-list-container">
-            {userData?.pendingPosts && (
+            {userData?.pendingPosts.length > 0 && (
               <MeetingCardList
                 title="참여 예정 모임"
                 meetings={userData.pendingPosts}
               />
             )}
-            {userData?.participatedPosts && (
+            {userData.participatedPosts.length > 0 && (
               <MeetingCardList
                 title="참여했던 모임"
                 meetings={userData.participatedPosts}
               />
             )}
-            {userData?.createdPosts && (
+            {userData?.createdPosts.length > 0 && (
               <MeetingCardList
                 title="내가 생성했던 모임"
                 meetings={userData.createdPosts}
