@@ -216,27 +216,6 @@ function MeetingDetail() {
                     max={10}
                     value={meeting.participantMaxNumber}
                     className="max-participants-range"
-                    style={{
-                      background: `linear-gradient(
-                        to right,
-                        var(--primary) 0%,
-                        var(--primary) ${
-                          ((meeting.maxParticipants -
-                            meeting.currentParticipants) /
-                            (meeting.maxParticipants -
-                              meeting.currentParticipants)) *
-                          100
-                        }%,
-                        var(--gray200) ${
-                          ((meeting.maxParticipants -
-                            meeting.currentParticipants) /
-                            (meeting.maxParticipants -
-                              meeting.currentParticipants)) *
-                          100
-                        }%,
-                        var(--gray200) 100%
-                      )`,
-                    }}
                   />
                   <span className="max-participants-value sb-14">
                     {maxParticipants}명
@@ -273,10 +252,10 @@ function MeetingDetail() {
           {!isCreator && (
             <button
               className="join-meeting-btn"
-              disabled={
-                meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
-                meeting.gatheringStatus === "GATHERING_PENDING"
-              }
+              // disabled={
+              //   meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
+              //   meeting.gatheringStatus === "GATHERING_PENDING"
+              // }
               onClick={handleJoinMeeting}
             >
               <span className="sb-14">신청하기</span>
@@ -286,10 +265,10 @@ function MeetingDetail() {
             <div>
               <button
                 className="delete-meeting-btn"
-                disabled={
-                  meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
-                  meeting.gatheringStatus === "GATHERING"
-                }
+                // disabled={
+                //   meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
+                //   meeting.gatheringStatus === "GATHERING"
+                // }
                 onClick={handleDeleteMeeting}
               >
                 <span className="sb-14">모임 취소</span>

@@ -6,7 +6,6 @@ header {
   background-color: var(--white);
   border-bottom: 1px solid var(--gray200);
   width: 100%;
-  padding: 20px 0;
 }
 
 header a {
