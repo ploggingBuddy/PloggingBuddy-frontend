@@ -131,15 +131,16 @@ function MeetingDetail() {
     const token = localStorage.getItem("kakao_token");
 
     try {
-      const response = await fetch(
-        `${BACKEND_API_URL}/gathering/delete/${meeting.postId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${BACKEND_API_URL}/gathering/delete`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: meeting.postId,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("모임 취소에 실패했습니다.");
