@@ -74,17 +74,6 @@ function MeetingDetail() {
     setLoading(true);
 
     try {
-      // 먼저 사용자 정보를 확인
-      const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-      }
-
       // 주소가 있는 경우에만 참가 신청 진행
       const response = await fetch(`${BACKEND_API_URL}/enroll/${id}`, {
         method: "POST",
@@ -121,37 +110,7 @@ function MeetingDetail() {
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
         setMeeting(updatedData);
-
-        // 마지막 참가자인 경우 모임 상태 변경
-        if (true) {
-          const finishResponse = await fetch(
-            `${BACKEND_API_URL}/gathering/gathering-finish/${id}`,
-            {
-              method: "PUT",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                postId: id,
-                gatheringStatus: updatedData.gatheringStatus,
-              }),
-            }
-          );
-
-          if (!finishResponse.ok) {
-            throw new Error("모임 상태 변경에 실패했습니다.");
-          }
-
-          // 상태 변경 후 다시 한번 모임 정보 새로고침
-          if (updatedResponse.ok) {
-            const updatedData = await updatedResponse.json();
-            setMeeting(updatedData);
-            alert("모임 참가 신청이 완료되었습니다! 모임이 마감되었습니다.");
-          }
-        } else {
-          alert("모임 참가 신청이 완료되었습니다!");
-        }
+        alert("모임 참가 신청이 완료되었습니다!");
         navigate("/mypage");
       }
     } catch (err) {
