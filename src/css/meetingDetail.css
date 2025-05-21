@@ -43,8 +43,9 @@
 
 .max-participants-control {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 16px;
   background-color: var(--gray100);
 }
 
@@ -59,7 +60,13 @@
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: var(--gray200);
+  background: linear-gradient(
+    to right,
+    var(--primary) 0%,
+    var(--primary) 50%,
+    var(--gray200) 50%,
+    var(--gray200) 100%
+  );
   border-radius: 2px;
   outline: none;
 }
@@ -76,11 +83,39 @@
 }
 
 .max-participants-range::-webkit-slider-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Firefox 스타일 */
+.max-participants-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
   background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.max-participants-range::-moz-range-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Firefox 트랙 스타일 */
+.max-participants-range::-moz-range-track {
+  height: 4px;
+  background: var(--gray200);
+  border-radius: 2px;
+}
+
+/* Firefox 진행 부분 스타일 */
+.max-participants-range::-moz-range-progress {
+  height: 4px;
+  background: var(--primary);
+  border-radius: 2px;
 }
 
 .max-participants-value {
-  min-width: 60px;
   text-align: center;
   color: var(--gray700);
 }

@@ -245,6 +245,17 @@ function MeetingDetail() {
                     value={maxParticipants}
                     onChange={(e) => setMaxParticipants(Number(e.target.value))}
                     className="max-participants-range"
+                    style={{
+                      background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${
+                        ((maxParticipants - meeting.currentParticipants) /
+                          (10 - meeting.currentParticipants)) *
+                        100
+                      }%, var(--gray200) ${
+                        ((maxParticipants - meeting.currentParticipants) /
+                          (10 - meeting.currentParticipants)) *
+                        100
+                      }%, var(--gray200) 100%)`,
+                    }}
                   />
                   <span className="max-participants-value sb-14">
                     {maxParticipants}명
