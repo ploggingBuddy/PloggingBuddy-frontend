@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../css/meetingDetail.css";
 import Loading from "../components/Loading";
-
+import { formatDate, formatAddress, formatDateTime } from "../utils/format";
 function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -261,15 +261,21 @@ function MeetingDetail() {
 
             <div className="info-item">
               <span className="label rg-14">모집 기간</span>
-              <span className="value sb-14">{meeting.gatheringEndTime}</span>
+              <span className="value sb-14">
+                {formatDate(meeting.gatheringEndTime)}
+              </span>
             </div>
             <div className="info-item">
               <span className="label rg-14">모임 장소</span>
-              <span className="value sb-14">{meeting.address}</span>
+              <span className="value sb-14">
+                {formatAddress(meeting.address)}
+              </span>
             </div>
             <div className="info-item">
               <span className="label rg-14">모임 시간</span>
-              <span className="value sb-14">{meeting.gatheringTime}</span>
+              <span className="value sb-14">
+                {formatDateTime(meeting.gatheringTime)}
+              </span>
             </div>
           </div>
           <div className="meeting-description">

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { formatDate, formatAddress, formatDateTime } from "../utils/format";
 
 function MeetingCard({
   content,
@@ -30,9 +31,8 @@ function MeetingCard({
         <span className="rg-14">
           현재 참여 인원: {participantCurrentNumber}/{participantMaxNumber}명
         </span>
-        <span className="rg-14">모집 기한 {gatheringEndTime}</span>
-        <span className="rg-14">모임 장소: {detailAddress}</span>
-        {/* <span className="rg-14">모임 시간: {gatheringStartTime}</span> */}
+        <span className="rg-14">모집 기한 {formatDate(gatheringEndTime)}</span>
+        <span className="rg-14">모임 장소: {formatAddress(detailAddress)}</span>
         <div className="card-desc rg-14">{content}</div>
       </div>
     </div>
