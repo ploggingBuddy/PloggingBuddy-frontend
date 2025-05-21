@@ -67,6 +67,52 @@ function MeetingDetail() {
       ? "hold"
       : "";
 
+  const handleJoinMeeting = async () => {
+    if (!meeting) return;
+    const token = localStorage.getItem("kakao_token");
+
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/enroll/${id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: id,
+          gatheringStatus: meeting.gatheringStatus,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem("kakao_token");
+          alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+          navigate("/login");
+          return;
+        }
+        throw new Error("모임 참가 신청에 실패했습니다.");
+      }
+
+      alert("모임 참가 신청이 완료되었습니다!");
+      // 모임 정보 새로고침
+      const updatedResponse = await fetch(
+        `${BACKEND_API_URL}/gathering/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (updatedResponse.ok) {
+        const updatedData = await updatedResponse.json();
+        setMeeting(updatedData);
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="meeting-detail-wrapper">
       <div className="meeting-detail-container">
@@ -78,10 +124,14 @@ function MeetingDetail() {
               ? "모집 완료"
               : meeting.gatheringStatus === "GATHERING_PENDING"
               ? "모집 마감 보류"
-              : "모집 진행중"}
+              : "모집 중"}
           </div>
           {/* 상세 정보 */}
           <div className="meeting-info">
+            <div className="info-item">
+              <span className="label rg-14">생성자: </span>
+              <span className="value sb-14">{meeting.leadUserNickname}</span>
+            </div>
             <div className="info-item">
               <span className="label rg-14">참여 인원</span>
               <span className="value sb-14">
@@ -183,6 +233,7 @@ function MeetingDetail() {
             <button
               className="join-meeting-btn"
               disabled={meeting.status === "모집 마감"}
+              onClick={handleJoinMeeting}
             >
               <span className="sb-14">신청하기</span>
             </button>
