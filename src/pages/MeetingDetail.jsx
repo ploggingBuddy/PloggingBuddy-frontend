@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAddressPopup } from "../contexts/AddressPopupContext";
 import "../css/meetingDetail.css";
 
 function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { openAddressPopup } = useAddressPopup();
   const [meeting, setMeeting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,6 +74,22 @@ function MeetingDetail() {
     const token = localStorage.getItem("kakao_token");
 
     try {
+      // 먼저 사용자 정보를 확인
+      const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        if (!userData.address) {
+          openAddressPopup();
+          return;
+        }
+      }
+
+      // 주소가 있는 경우에만 참가 신청 진행
       const response = await fetch(`${BACKEND_API_URL}/enroll/${id}`, {
         method: "POST",
         headers: {

@@ -1,7 +1,9 @@
 import React from "react";
 import "../css/addressPopup.css";
 
-function AddressPopup({ onClose }) {
+function AddressPopup({ open, onClose }) {
+  if (!open) return null;
+
   return (
     <div className="popup-overlay">
       <div className="address-popup">

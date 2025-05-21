@@ -1,7 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import { AuthProvider } from "./contexts/AuthContext";
+import {
+  AddressPopupProvider,
+  useAddressPopup,
+} from "./contexts/AddressPopupContext";
 import LoginModal from "./login/LoginModal";
+import AddressPopup from "./components/AddressPopup";
 import { useAuth } from "./contexts/AuthContext";
 
 import MyPage from "./pages/MyPage";
@@ -24,6 +29,7 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
   const { showLoginModal, login, setShowLoginModal } = useAuth();
+  const { showAddressPopup, closeAddressPopup } = useAddressPopup();
 
   const handleLoginSuccess = (data) => {
     login(data);
@@ -38,6 +44,7 @@ function AppContent() {
         onClose={() => setShowLoginModal(false)}
         onLoginSuccess={handleLoginSuccess}
       />
+      <AddressPopup open={showAddressPopup} onClose={closeAddressPopup} />
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/main" element={<MainPage />} />
@@ -74,9 +81,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <AddressPopupProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AddressPopupProvider>
     </AuthProvider>
   );
 }
