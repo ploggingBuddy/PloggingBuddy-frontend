@@ -1,15 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import dummyMeetups from "../data/dummyMeetups";
+
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 function MapSection() {
   const navigate = useNavigate();
+  const [meetups, setMeetups] = useState([]);
+  const token = localStorage.getItem("kakao_token");
 
+  // 1. 특정 위치 기반으로 모임 데이터 fetch
+  useEffect(() => {
+    const fetchMeetups = async () => {
+      const lat = 37.56367012895697;
+      const lng = 126.97561977957132;
+
+      try {
+        const response = await fetch(
+          `${BACKEND_API_URL}/gathering/spot/${lat}/${lng}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        setMeetups(data.gatheringPreviewList || []);
+      } catch (error) {
+        console.error("모임 데이터 요청 실패:", error);
+      }
+    };
+
+    fetchMeetups();
+  }, [token]);
+
+  // 2. 지도 로딩 및 마커 표시
   useEffect(() => {
     const script = document.createElement("script");
-
     const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
-    //kakaoAPI
+
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
     script.async = true;
     document.head.appendChild(script);
@@ -18,10 +47,9 @@ function MapSection() {
       window.kakao.maps.load(() => {
         const container = document.getElementById("map");
         const options = {
-          center: new window.kakao.maps.LatLng(37.5665, 126.978),
+          center: new window.kakao.maps.LatLng(37.56367012895697, 126.97561977957132),
           level: 5,
         };
-
         const map = new window.kakao.maps.Map(container, options);
 
         const markerImage = new window.kakao.maps.MarkerImage(
@@ -32,66 +60,20 @@ function MapSection() {
 
         let currentOverlay = null;
 
-        dummyMeetups.forEach((meetup) => {
+        meetups.forEach((item) => {
           const marker = new window.kakao.maps.Marker({
             map,
-            position: new window.kakao.maps.LatLng(meetup.lat, meetup.lng),
+            position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
             image: markerImage,
           });
 
           const contentDiv = document.createElement("div");
           contentDiv.innerHTML = `
-            <div style="
-              width: 300px;
-              background: white;
-              border-radius: 10px;
-              padding: 16px;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-              font-family: sans-serif;
-              overflow: hidden;
-            ">
-              <h3 style="margin: 0 0 8px;">${meetup.title}</h3>
-              <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
-                <span style="background:#e0f7e9; color:#2e7d32; padding: 2px 6px; border-radius: 4px; font-weight: bold;">
-                  모임 중
-                </span> 
-                &nbsp; 최대 ${meetup.max || 10}명 · ${
-            meetup.deadline || "3시간"
-          } 후 마감
-              </div>
-              <div style="font-size: 13px; margin-bottom: 6px;">📍 ${
-                meetup.location
-              }</div>
-              <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-                ${meetup.images
-                  .slice(0, 2)
-                  .map(
-                    (img) => `
-                  <img src="${img}" style="width: 48%; height: 60px; object-fit: cover; border-radius: 4px;" />
-                `
-                  )
-                  .join("")}
-              </div>
-              <p style="
-                font-size: 13px;
-                color: #444;
-                margin-bottom: 10px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              ">
-                ${meetup.description || "설명이 준비 중입니다."}
-              </p>
-              <button id="detail-btn-${meetup.id}" style="
-                width: 100%;
-                padding: 8px;
-                background: #a5d6a7;
-                color: #1b5e20;
-                border: none;
-                border-radius: 6px;
-                font-weight: bold;
-                cursor: pointer;
-              ">상세 정보 보기</button>
+            <div style="width: 250px; background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-family: sans-serif;">
+              <strong>모임 ID: ${item.gatheringPostId}</strong>
+              <button id="btn-${item.gatheringPostId}" style="margin-top: 8px; width: 100%; padding: 8px; border: none; background: #81c784; color: white; border-radius: 4px; cursor: pointer;">
+                상세 정보 보기
+              </button>
             </div>
           `;
 
@@ -107,12 +89,10 @@ function MapSection() {
             currentOverlay = overlay;
 
             setTimeout(() => {
-              const detailBtn = document.getElementById(
-                `detail-btn-${meetup.id}`
-              );
-              if (detailBtn) {
-                detailBtn.onclick = () => {
-                  navigate(`/meeting/${meetup.id}`);
+              const btn = document.getElementById(`btn-${item.gatheringPostId}`);
+              if (btn) {
+                btn.onclick = () => {
+                  navigate(`/meeting/${item.gatheringPostId}`);
                 };
               }
             }, 0);
@@ -125,7 +105,7 @@ function MapSection() {
       const existing = document.querySelector('script[src*="dapi.kakao.com"]');
       if (existing) document.head.removeChild(existing);
     };
-  }, [navigate]);
+  }, [meetups, navigate]);
 
   return (
     <div
