@@ -95,7 +95,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
         <ProfileField
           ref={nicknameRef}
           label="닉네임"
-          value={nickname}
+          defaultValue={nickname}
           onEdit={handleNicknameEdit}
         />
         <div>

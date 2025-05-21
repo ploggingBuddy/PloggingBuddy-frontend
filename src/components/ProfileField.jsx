@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import editIcon from "../assets/edit.svg";
 
-const ProfileField = forwardRef(({ label, value, onChange, onEdit }, ref) => {
+const ProfileField = forwardRef(({ label, defaultValue, onEdit }, ref) => {
   return (
     <div>
       <label className="rg-14">{label}</label>
@@ -9,8 +9,7 @@ const ProfileField = forwardRef(({ label, value, onChange, onEdit }, ref) => {
         <input
           ref={ref}
           type="text"
-          value={value}
-          onChange={onChange}
+          defaultValue={defaultValue}
           readOnly={!onEdit}
         />
         {onEdit && (
