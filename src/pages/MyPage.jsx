@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProfileInfo from "./ProfileInfo";
 import MeetingCardList from "../components/MeetingCardList";
-import { useAddressPopup } from "../contexts/AddressPopupContext";
 import "../css/mypage.css";
 
 function ActivityTab({ tab, setTab }) {
@@ -27,7 +26,6 @@ function MyPage() {
   const [tab, setTab] = useState("profile");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { openAddressPopup } = useAddressPopup();
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -44,11 +42,6 @@ function MyPage() {
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         setUserData(data);
-
-        // 주소 정보가 없는 경우 팝업 표시
-        if (!data.address) {
-          openAddressPopup();
-        }
       } catch (e) {
         alert(e.message);
       } finally {
@@ -57,7 +50,7 @@ function MyPage() {
     };
 
     fetchUserData();
-  }, [BACKEND_API_URL, openAddressPopup]);
+  }, [BACKEND_API_URL]);
 
   if (loading) return <div>로딩 중...</div>;
 
