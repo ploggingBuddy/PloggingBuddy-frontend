@@ -1,6 +1,5 @@
 import { useState } from "react";
 import profileDefault from "../assets/profile_default.jpg";
-import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
