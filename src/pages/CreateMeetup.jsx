@@ -15,14 +15,22 @@ const CreateMeetup = () => {
   });
 
   const [showMap, setShowMap] = useState(false);
-  
+
   useEffect(() => {
     const token = localStorage.getItem("kakao_token");
     if (!token) {
       alert("로그인 정보가 없습니다. 메인 페이지로 이동합니다.");
       navigate("/"); // 또는 로그인 페이지로 이동
     }
+
+    const reloaded = sessionStorage.getItem("createMeetupReloaded");
+    if (!reloaded) {
+      sessionStorage.setItem("createMeetupReloaded", "true");
+      window.location.reload();
+    }
   }, []);
+
+
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
   const token = localStorage.getItem("kakao_token");
