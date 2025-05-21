@@ -1,12 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useAddressPopup } from "../contexts/AddressPopupContext";
 import "../css/meetingDetail.css";
 
 function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { openAddressPopup } = useAddressPopup();
   const [meeting, setMeeting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -83,10 +81,6 @@ function MeetingDetail() {
 
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        if (!userData.address) {
-          openAddressPopup();
-          return;
-        }
       }
 
       // 주소가 있는 경우에만 참가 신청 진행
