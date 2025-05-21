@@ -7,7 +7,7 @@ import mapIcon from "../assets/solar_map-linear.png";
 
 function ProfileInfo({ ...userData }) {
   console.log(userData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
   const [tempNickname, setTempNickname] = useState(null);
