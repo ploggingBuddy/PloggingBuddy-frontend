@@ -25,38 +25,36 @@ function ProfileInfo() {
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!userData || isDirty) {
-        const token = localStorage.getItem("kakao_token");
-        setLoading(true);
-        try {
-          const res = await fetch(`${BACKEND_API_URL}/member/me`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+      const token = localStorage.getItem("kakao_token");
+      setLoading(true);
+      try {
+        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
+        const data = await res.json();
+        setUserData(data);
+        setTempNickname(data.nickname);
+        setTempRegion(data.detailAddress);
+        if (data.address) {
+          setCoordinates({
+            lat: data.address.latitude || 0,
+            lng: data.address.longitude || 0,
           });
-          if (!res.ok) throw new Error("유저 정보 불러오기 실패");
-          const data = await res.json();
-          setUserData(data);
-          setTempNickname(data.nickname);
-          setTempRegion(data.detailAddress);
-          if (data.address) {
-            setCoordinates({
-              lat: data.address.latitude || 0,
-              lng: data.address.longitude || 0,
-            });
-          }
-        } catch (e) {
-          alert(e.message);
-        } finally {
-          setLoading(false);
-          setIsDirty(false);
         }
+      } catch (e) {
+        alert(e.message);
+      } finally {
+        setLoading(false);
+        setIsDirty(false);
       }
     };
 
     fetchUserData();
-  }, [isDirty, userData, BACKEND_API_URL]);
+  }, [isDirty, BACKEND_API_URL]);
 
   const handleNicknameEdit = async () => {
     const token = localStorage.getItem("kakao_token");
