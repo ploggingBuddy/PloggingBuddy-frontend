@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
@@ -14,14 +14,16 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleMapSelect = ({ latlng, addressText }) => {
-    setTempRegion(addressText);
+    if (addressRef.current) {
+      addressRef.current.value = addressText;
+    }
     setCoordinates(latlng);
     setShowMapModal(false);
   };
 
   const handleNicknameEdit = async () => {
     const token = localStorage.getItem("kakao_token");
-    if (!nicknameRef.current.value) {
+    if (!nicknameRef.current?.value) {
       alert("닉네임을 입력해주세요.");
       return;
     }
@@ -45,6 +47,11 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
 
   const handleAddressEdit = async () => {
     const token = localStorage.getItem("kakao_token");
+    if (!addressRef.current?.value) {
+      alert("주소를 입력해주세요.");
+      return;
+    }
+
     try {
       const res = await fetch(`${BACKEND_API_URL}/member/address`, {
         method: "POST",
@@ -80,7 +87,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   return (
     <div className="profile-info">
       <img
-        src={userData.profileImage ?? profileDefault}
+        src={profileImage ?? profileDefault}
         alt="프로필"
         className="profile-img"
       />
@@ -88,24 +95,19 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
         <ProfileField
           ref={nicknameRef}
           label="닉네임"
-          value={userData.nickname}
-          onChange={(e) => setTempNickname(e.target.value)}
+          value={nickname}
           onEdit={handleNicknameEdit}
         />
         <div>
           <label className="rg-14">이메일</label>
           <div>
-            <span className="rg-14">{userData.email}</span>
+            <span className="rg-14">{email}</span>
           </div>
         </div>
         <div>
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
-            <input
-              ref={addressRef}
-              value={userData.address}
-              onChange={(e) => setTempRegion(e.target.value)}
-            />
+            <input ref={addressRef} type="text" defaultValue={address} />
             <button
               type="button"
               onClick={() => setShowMapModal(true)}
