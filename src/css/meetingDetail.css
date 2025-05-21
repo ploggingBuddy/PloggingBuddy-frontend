@@ -183,15 +183,11 @@
 
 .delete-meeting-btn {
   width: 140px;
-  height: 24px;
+  height: 48px;
   padding: 12px 16px;
   background-color: var(--red);
   color: var(--white);
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.delete-meeting-btn:hover {
-  background-color: var(--red-dark);
 }

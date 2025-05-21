@@ -61,6 +61,7 @@ function MyPage() {
         {tab === "profile" ? (
           <ProfileInfo
             nickname={userData.nickname}
+            email={userData.email}
             address={userData.address}
             profileImage={userData.profileImage}
           />
