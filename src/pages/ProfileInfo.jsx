@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
@@ -8,22 +8,20 @@ import mapIcon from "../assets/solar_map-linear.png";
 function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   const [showMapModal, setShowMapModal] = useState(false);
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
-  const nicknameRef = useRef(null);
-  const addressRef = useRef(null);
+  const [editNickname, setEditNickname] = useState(nickname);
+  const [editAddress, setEditAddress] = useState(address);
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleMapSelect = ({ latlng, addressText }) => {
-    if (addressRef.current) {
-      addressRef.current.value = addressText;
-    }
+    setEditAddress(addressText);
     setCoordinates(latlng);
     setShowMapModal(false);
   };
 
   const handleNicknameEdit = async () => {
     const token = localStorage.getItem("kakao_token");
-    if (!nicknameRef.current?.value) {
+    if (!editNickname) {
       alert("닉네임을 입력해주세요.");
       return;
     }
@@ -35,7 +33,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ nickname: nicknameRef.current.value }),
+        body: JSON.stringify({ nickname: editNickname }),
       });
       if (!res.ok) throw new Error("닉네임 변경 실패");
       alert("닉네임이 성공적으로 변경되었습니다!");
@@ -47,7 +45,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
 
   const handleAddressEdit = async () => {
     const token = localStorage.getItem("kakao_token");
-    if (!addressRef.current?.value) {
+    if (!editAddress) {
       alert("주소를 입력해주세요.");
       return;
     }
@@ -60,7 +58,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          detailAddress: addressRef.current.value,
+          detailAddress: editAddress,
           latitude: coordinates.lat,
           longitude: coordinates.lng,
         }),
@@ -92,12 +90,23 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
         className="profile-img"
       />
       <div className="profile-fields">
-        <ProfileField
-          ref={nicknameRef}
-          label="닉네임"
-          defaultValue={nickname}
-          onEdit={handleNicknameEdit}
-        />
+        <div>
+          <label className="rg-14">닉네임</label>
+          <div className="profile-field--input">
+            <input
+              type="text"
+              value={editNickname}
+              onChange={(e) => setEditNickname(e.target.value)}
+            />
+            <button
+              type="button"
+              className="edit-btn"
+              onClick={handleNicknameEdit}
+            >
+              <img className="edit-icon" src={editIcon} alt="edit" />
+            </button>
+          </div>
+        </div>
         <div>
           <label className="rg-14">이메일</label>
           <div>
@@ -107,7 +116,11 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
         <div>
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
-            <input ref={addressRef} type="text" defaultValue={address} />
+            <input
+              type="text"
+              value={editAddress}
+              onChange={(e) => setEditAddress(e.target.value)}
+            />
             <button
               type="button"
               onClick={() => setShowMapModal(true)}
