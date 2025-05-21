@@ -15,22 +15,7 @@ const CreateMeetup = () => {
   });
 
   const [showMap, setShowMap] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-  const token = localStorage.getItem("kakao_token");
-  if (!token) {
-    alert("로그인 정보가 없습니다. 메인 페이지로 이동합니다.");
-    navigate("/");
-  }
-  setLoading(false); // 여기서 로딩 종료
-  }, []);
-
-  // 렌더링 조건
-  if (loading) {
-    return <div style={{ padding: "40px" }}>로딩 중...</div>;
-  }
+  
   useEffect(() => {
     const token = localStorage.getItem("kakao_token");
     if (!token) {
