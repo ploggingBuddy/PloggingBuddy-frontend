@@ -167,7 +167,7 @@ function MeetingDetail() {
         },
         body: JSON.stringify({
           postId: meeting.postId,
-          maxParticipants: maxParticipants,
+          participantMaxNumber: maxParticipants,
           imageList: meeting.imageList,
         }),
       });
