@@ -94,7 +94,6 @@ function MeetingDetail() {
                     min={meeting.currentParticipants}
                     max={10}
                     value={maxParticipants}
-                    onChange={handleMaxParticipantsChange}
                     className="max-participants-range"
                     style={{
                       background: `linear-gradient(
@@ -177,7 +176,6 @@ function MeetingDetail() {
           {!isCreator && (
             <button
               className="join-meeting-btn"
-              onClick={handleJoinMeeting}
               disabled={meeting.status === "모집 마감"}
             >
               <span className="sb-14">신청하기</span>
