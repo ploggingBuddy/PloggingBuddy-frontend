@@ -6,7 +6,8 @@ import ImageUpload from "./ImageUpload.jsx";
 import LocationInput from "./LocationInput.jsx";
 import DescriptionInput from "./DescriptionInput.jsx";
 import MeetupTimeInput from "./MeetupTimeInput.jsx";
-import MapModal from "./MapModal.jsx";
+//import MapModal from "./MapModal.jsx";
+import MapModal2 from "./MapModal2.jsx";
 
 const MeetupForm = ({
   formData,
@@ -55,7 +56,7 @@ const MeetupForm = ({
       </div>
 
       {showMap && (
-        <MapModal
+        <MapModal2
           key={Date.now()}
           onClose={() => setShowMap(false)} 
           onSelect={(data) => {
