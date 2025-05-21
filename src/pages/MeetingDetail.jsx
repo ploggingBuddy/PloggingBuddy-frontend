@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import "../css/meetingDetail.css";
 
 function MeetingDetail() {
@@ -11,7 +11,6 @@ function MeetingDetail() {
   const [currentParticipants, setCurrentParticipants] = useState(0);
   const [isCreator, setIsCreator] = useState(false);
   const [maxParticipants, setMaxParticipants] = useState(10);
-  const maxParticipantsInputRef = useRef(null);
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -45,7 +44,9 @@ function MeetingDetail() {
         const data = await response.json();
         console.log(data);
         setMeeting(data);
-        setMaxParticipants(data.maxParticipants);
+        setMaxParticipants(data.participantMaxNumber);
+        setIsCreator(data.isCreator);
+        setCurrentParticipants(data.currentParticipants);
       } catch (err) {
         setError(err.message);
       } finally {
