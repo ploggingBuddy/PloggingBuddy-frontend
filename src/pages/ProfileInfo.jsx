@@ -5,13 +5,25 @@ import MapModal from "../components/MapModal";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
-function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
+function ProfileInfo({
+  nickname: initialNickname,
+  email: initialEmail,
+  address: initialAddress,
+  profileImage: initialProfileImage,
+  onUpdate,
+}) {
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
-  const [tempNickname, setTempNickname] = useState(null);
-  const [tempRegion, setTempRegion] = useState(null);
+  const [tempNickname, setTempNickname] = useState(initialNickname);
+  const [tempRegion, setTempRegion] = useState(initialAddress);
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
+  const [userData, setUserData] = useState({
+    nickname: initialNickname,
+    email: initialEmail,
+    address: initialAddress,
+    profileImage: initialProfileImage,
+  });
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -21,16 +33,24 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
     setShowMapModal(false);
   };
 
+  // props가 변경될 때 state 업데이트
+  useEffect(() => {
+    setUserData({
+      nickname: initialNickname,
+      email: initialEmail,
+      address: initialAddress,
+      profileImage: initialProfileImage,
+    });
+    setTempNickname(initialNickname);
+    setTempRegion(initialAddress);
+  }, [initialNickname, initialEmail, initialAddress, initialProfileImage]);
+
   // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("kakao_token");
       setLoading(true);
       try {
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
           method: "GET",
           headers: {
@@ -40,10 +60,12 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
         console.log(data);
-        nickname = data.nickname;
-        email = data.email;
-        address = data.address;
-        profileImage = data.profileImageUrl;
+        setUserData({
+          nickname: data.nickname,
+          email: data.email,
+          address: data.detailAddress,
+          profileImage: data.profileImageUrl,
+        });
         setTempNickname(data.nickname);
         setTempRegion(data.detailAddress);
         if (data.address) {
@@ -128,28 +150,28 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   return (
     <div className="profile-info">
       <img
-        src={profileImage ?? profileDefault}
+        src={userData.profileImage ?? profileDefault}
         alt="프로필"
         className="profile-img"
       />
       <div className="profile-fields">
         <ProfileField
           label="닉네임"
-          value={tempNickname ?? nickname}
+          value={tempNickname ?? userData.nickname}
           onChange={(e) => setTempNickname(e.target.value)}
           onEdit={handleNicknameEdit}
         />
         <div>
           <label className="rg-14">이메일</label>
           <div>
-            <span className="rg-14">{email}</span>
+            <span className="rg-14">{userData.email}</span>
           </div>
         </div>
         <div>
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={tempRegion ?? address}
+              value={tempRegion ?? userData.address}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
