@@ -113,7 +113,11 @@ function ProfileInfo() {
 
   return (
     <div className="profile-info">
-      <img src={profileDefault} alt="프로필" className="profile-img" />
+      <img
+        src={userData?.profileImageUrl ?? profileDefault}
+        alt="프로필"
+        className="profile-img"
+      />
       <div className="profile-fields">
         <ProfileField
           label="닉네임"
@@ -138,6 +142,7 @@ function ProfileInfo() {
               type="button"
               onClick={() => setShowMapModal(true)}
               style={{
+                backgroundColor: "white",
                 width: "48px",
                 height: "42px",
                 border: "none",
