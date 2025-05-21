@@ -125,6 +125,31 @@ function MeetingDetail() {
     }
   };
 
+  const handleDeleteMeeting = async () => {
+    if (!meeting) return;
+    const token = localStorage.getItem("kakao_token");
+
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/gathering/delete`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          postId: meeting.postId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("모임 취소에 실패했습니다.");
+      }
+
+      alert("모임 취소가 완료되었습니다.");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="meeting-detail-wrapper">
       <div className="meeting-detail-container">
@@ -152,7 +177,7 @@ function MeetingDetail() {
             </div>
 
             {/* 모임 생성자인 경우에만 인원 변경 버튼 표시 */}
-            {isCreator && (
+            {!isCreator && (
               <div className="info-item">
                 <div className="max-participants-control">
                   <input
@@ -214,11 +239,28 @@ function MeetingDetail() {
           {!isCreator && (
             <button
               className="join-meeting-btn"
-              disabled={meeting.status === "모집 마감"}
+              disabled={
+                meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
+                meeting.gatheringStatus === "GATHERING_PENDING"
+              }
               onClick={handleJoinMeeting}
             >
               <span className="sb-14">신청하기</span>
             </button>
+          )}
+          {!isCreator && (
+            <div>
+              <button
+                className="delete-meeting-btn"
+                disabled={
+                  meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
+                  meeting.gatheringStatus === "GATHERING"
+                }
+                onClick={handleDeleteMeeting}
+              >
+                <span className="sb-14">모임 취소</span>
+              </button>
+            </div>
           )}
         </main>
       </div>
