@@ -132,7 +132,7 @@ function MeetingDetail() {
         setMeeting(updatedData);
 
         // 마지막 참가자인 경우 모임 상태 변경
-        if (updatedData.currentParticipants === 0) {
+        if (updatedData.currentParticipants > 0) {
           const finishResponse = await fetch(
             `${BACKEND_API_URL}/gathering/gathering-finish/${id}`,
             {
