@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import ProfileInfo from "./ProfileInfo";
 import MeetingCardList from "../components/MeetingCardList";
 import "../css/mypage.css";
+import Loading from "../components/Loading";
 
 function ActivityTab({ tab, setTab }) {
   return (
@@ -52,7 +53,15 @@ function MyPage() {
     fetchUserData();
   }, [fetchUserData]);
 
-  if (loading) return <div>로딩 중...</div>;
+  if (loading) {
+    return (
+      <div className="meeting-detail-wrapper">
+        <div className="meeting-detail-container">
+          <Loading overlay={true} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mypage-bg">

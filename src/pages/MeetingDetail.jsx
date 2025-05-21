@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../css/meetingDetail.css";
+import Loading from "../components/Loading";
 
 function MeetingDetail() {
   const { id } = useParams();
@@ -57,7 +58,16 @@ function MeetingDetail() {
     fetchMeetingDetail();
   }, [id, navigate, BACKEND_API_URL]);
 
-  if (loading) return <div className="loading">로딩중...</div>;
+  if (loading) {
+    return (
+      <div className="meeting-detail-wrapper">
+        <div className="meeting-detail-container">
+          <Loading overlay={true} />
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <div className="error">{error}</div>;
   if (!meeting) return <div className="error">모임을 찾을 수 없습니다.</div>;
 
@@ -157,6 +167,7 @@ function MeetingDetail() {
   const handleChangeMaxParticipants = async () => {
     if (!meeting) return;
     const token = localStorage.getItem("kakao_token");
+    setLoading(true);
 
     try {
       const response = await fetch(`${BACKEND_API_URL}/gathering/update`, {
@@ -192,6 +203,8 @@ function MeetingDetail() {
       }
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
