@@ -77,8 +77,8 @@ function MeetingDetail() {
             {meeting.gatheringStatus === "GATHERING_CONFIRMED"
               ? "모집 완료"
               : meeting.gatheringStatus === "GATHERING_PENDING"
-              ? "모집 진행중"
-              : "모집 마감 보류"}
+              ? "모집 마감 보류"
+              : "모집 진행중"}
           </div>
           {/* 상세 정보 */}
           <div className="meeting-info">
@@ -137,6 +137,10 @@ function MeetingDetail() {
             <div className="info-item">
               <span className="label rg-14">모임 장소</span>
               <span className="value sb-14">{meeting.address}</span>
+            </div>
+            <div className="info-item">
+              <span className="label rg-14">모임 시간</span>
+              <span className="value sb-14">{meeting.gatheringTime}</span>
             </div>
           </div>
           <div className="meeting-description">
