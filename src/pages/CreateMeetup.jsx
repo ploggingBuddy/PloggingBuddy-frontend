@@ -21,14 +21,23 @@ const CreateMeetup = () => {
     if (!token) {
       alert("로그인 정보가 없습니다. 메인 페이지로 이동합니다.");
       navigate("/"); // 또는 로그인 페이지로 이동
+      return;
     }
 
-    const reloaded = sessionStorage.getItem("createMeetupReloaded");
-    if (!reloaded) {
-      sessionStorage.setItem("createMeetupReloaded", "true");
+    // 페이지 진입할 때마다 강제로 새로고침
+    // 단, 새로고침 중 무한 루프 방지를 위해 리로드 체크 삽입
+    const reloadKey = "forceReloaded_CreateMeetup";
+    const hasReloaded = sessionStorage.getItem(reloadKey);
+
+    if (!hasReloaded) {
+      sessionStorage.setItem(reloadKey, "true");
       window.location.reload();
+    } else {
+      // 새로고침 이후에는 플래그 제거해서 다음 진입 때 다시 새로고침되도록 함
+      sessionStorage.removeItem(reloadKey);
     }
   }, []);
+
 
 
 
