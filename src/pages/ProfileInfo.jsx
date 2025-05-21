@@ -16,6 +16,12 @@ function ProfileInfo() {
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
+  const handleTokenExpired = () => {
+    localStorage.removeItem("kakao_token");
+    alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+    navigate("/login");
+  };
+
   const handleMapSelect = ({ latlng, addressText }) => {
     setTempRegion(addressText);
     setCoordinates(latlng);
@@ -28,6 +34,11 @@ function ProfileInfo() {
       const token = localStorage.getItem("kakao_token");
       setLoading(true);
       try {
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        console.log("Request headers:", headers); // 요청 헤더 확인
+
         const res = await fetch(`${BACKEND_API_URL}/member/me`, {
           method: "GET",
           headers: {
