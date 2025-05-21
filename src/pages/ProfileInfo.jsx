@@ -2,62 +2,31 @@ import { useState, useEffect } from "react";
 import profileDefault from "../assets/profile_default.jpg";
 import ProfileField from "../components/ProfileField";
 import MapModal from "../components/MapModal";
-import { data } from "react-router-dom";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
 function ProfileInfo() {
-  const [nickname, setNickname] = useState(null);
-  const [tempNickname, setTempNickname] = useState(null); // 임시 닉네임 상태 추가
-  const [email, setEmail] = useState(null);
-  const [region, setRegion] = useState(null);
-  const [tempRegion, setTempRegion] = useState(null); // 임시 지역 정보 상태 추가
-  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 }); // 위도/경도 상태 추가
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isDirty, setIsDirty] = useState(false); // 수정 시 true
-  const [showMapModal, setShowMapModal] = useState(false); //지도 모달 상태
+  const [isDirty, setIsDirty] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [tempNickname, setTempNickname] = useState(null);
+  const [tempRegion, setTempRegion] = useState(null);
+  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
 
-  const token = localStorage.getItem("kakao_token");
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   const handleMapSelect = ({ latlng, addressText }) => {
-    setRegion(addressText);
     setTempRegion(addressText);
-    setCoordinates(latlng); // 위도/경도 정보 저장
+    setCoordinates(latlng);
     setShowMapModal(false);
   };
 
-  // 지역 정보 수정 함수
-  const handleAddressEdit = async () => {
-    try {
-      const res = await fetch(`${BACKEND_API_URL}/member/address`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          detailAddress: tempRegion,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-        }),
-      });
-
-      if (!res.ok) throw new Error("지역 정보 변경 실패");
-
-      setRegion(tempRegion);
-      setIsDirty(true);
-      alert("지역 정보가 성공적으로 변경되었습니다!");
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
-  // ✅ 유저 정보 불러오기  (GET /api/member/me)
+  // 유저 정보 불러오기
   useEffect(() => {
     const fetchUserData = async () => {
       if (!userData || isDirty) {
+        const token = localStorage.getItem("kakao_token");
         setLoading(true);
         try {
           const res = await fetch(`${BACKEND_API_URL}/member/me`, {
@@ -68,14 +37,9 @@ function ProfileInfo() {
           });
           if (!res.ok) throw new Error("유저 정보 불러오기 실패");
           const data = await res.json();
-          console.log(data);
           setUserData(data);
-          setNickname(data.nickname);
           setTempNickname(data.nickname);
-          setEmail(data.email);
-          setRegion(data.detailAddress);
           setTempRegion(data.detailAddress);
-          // 기존 주소의 위도/경도 정보가 있다면 설정
           if (data.address) {
             setCoordinates({
               lat: data.address.latitude || 0,
@@ -92,10 +56,10 @@ function ProfileInfo() {
     };
 
     fetchUserData();
-  }, [isDirty, token, userData, BACKEND_API_URL]);
+  }, [isDirty, userData, BACKEND_API_URL]);
 
-  // TODO: 각 필드 수정 시 PATCH /api/member/nickname 등으로 변경 요청
   const handleNicknameEdit = async () => {
+    const token = localStorage.getItem("kakao_token");
     if (!tempNickname) {
       alert("닉네임을 입력해주세요.");
       return;
@@ -110,23 +74,42 @@ function ProfileInfo() {
         },
         body: JSON.stringify({ nickname: tempNickname }),
       });
-
       if (!res.ok) throw new Error("닉네임 변경 실패");
-
-      // 상태 업데이트를 한 번에 처리
-      setNickname(tempNickname);
-      setIsDirty(true);
       alert("닉네임이 성공적으로 변경되었습니다!");
+      setIsDirty(true);
     } catch (e) {
       alert(e.message);
     }
   };
 
-  // TODO: 회원 탈퇴 API 연동 (DELETE /api/user)
+  const handleAddressEdit = async () => {
+    const token = localStorage.getItem("kakao_token");
+    try {
+      const res = await fetch(`${BACKEND_API_URL}/member/address`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          detailAddress: tempRegion,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+        }),
+      });
+      if (!res.ok) throw new Error("지역 정보 변경 실패");
+      alert("지역 정보가 성공적으로 변경되었습니다!");
+      setIsDirty(true);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
   const handleWithdraw = () => {
     alert("정말로 회원을 탈퇴하시겠습니까?");
-    // fetch('/api/user', { method: 'DELETE' }) 등
   };
+
+  if (loading) return <div>로딩 중...</div>;
 
   return (
     <div className="profile-info">
@@ -134,21 +117,21 @@ function ProfileInfo() {
       <div className="profile-fields">
         <ProfileField
           label="닉네임"
-          value={tempNickname ?? nickname}
+          value={tempNickname ?? userData?.nickname}
           onChange={(e) => setTempNickname(e.target.value)}
           onEdit={handleNicknameEdit}
         />
         <div>
           <label className="rg-14">이메일</label>
           <div>
-            <span className="rg-14">{email}</span>
+            <span className="rg-14">{userData?.email}</span>
           </div>
         </div>
         <div>
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={region}
+              value={tempRegion ?? userData?.detailAddress}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
@@ -157,10 +140,7 @@ function ProfileInfo() {
               style={{
                 width: "48px",
                 height: "42px",
-                border: "1px solid #ccc",
-                borderLeft: "none",
-                borderTopRightRadius: "6px",
-                borderBottomRightRadius: "6px",
+                border: "none",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -185,11 +165,10 @@ function ProfileInfo() {
         </div>
       </div>
 
-      <button className="withdraw-btn " onClick={handleWithdraw}>
+      <button className="withdraw-btn" onClick={handleWithdraw}>
         <span className="sb-14">회원 탈퇴</span>
       </button>
 
-      {/*지도 모달 연결 */}
       {showMapModal && (
         <MapModal
           onClose={() => setShowMapModal(false)}
