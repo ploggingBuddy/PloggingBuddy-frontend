@@ -72,7 +72,7 @@ function MyPage() {
             nickname={userData?.nickname}
             email={userData?.email}
             address={userData?.detailAddress}
-            profileImage={userData?.profileImage}
+            profileImage={userData?.profileImageUrl}
             onUpdate={fetchUserData}
           />
         ) : (

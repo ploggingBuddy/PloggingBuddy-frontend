@@ -41,20 +41,70 @@
    인원 변경 컨트롤
    ========================= */
 
-.change-max-btn {
-  display: inline-flex;
-  padding: 4px 12px;
-  justify-content: center;
+.max-participants-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--gray100);
+  border-radius: 8px;
+}
+
+.range-container {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--white);
-  border-radius: 4px;
-  border: 1px solid var(--gray200);
+  gap: 16px;
+}
+
+.max-participants-range {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--gray200);
+  border-radius: 2px;
+  outline: none;
+}
+
+.max-participants-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.max-participants-range::-webkit-slider-thumb:hover {
+  background: var(--primary);
+}
+
+.max-participants-value {
+  min-width: 60px;
+  text-align: center;
+  color: var(--gray700);
+}
+
+.change-max-btn {
+  align-self: flex-end;
+  padding: 8px 16px;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .change-max-btn:hover {
-  background-color: var(--gray50);
+  background-color: var(--primary-dark);
+}
+
+.change-max-btn:disabled {
+  background-color: var(--gray300);
+  cursor: not-allowed;
 }
 
 /* =========================

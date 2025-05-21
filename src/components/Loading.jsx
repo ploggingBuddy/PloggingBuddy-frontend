@@ -7,7 +7,6 @@ function Loading({ overlay = false, text = "로딩 중" }) {
   return (
     <div className={containerClass}>
       <div className="loading-container">
-        <div className="loading-spinner"></div>
         <p className="loading-text">
           {text}
           <span className="loading-dots"></span>
