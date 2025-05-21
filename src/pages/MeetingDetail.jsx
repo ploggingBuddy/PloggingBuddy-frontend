@@ -58,16 +58,6 @@ function MeetingDetail() {
     fetchMeetingDetail();
   }, [id, navigate, BACKEND_API_URL]);
 
-  if (loading) {
-    return (
-      <div className="meeting-detail-wrapper">
-        <div className="meeting-detail-container">
-          <Loading overlay={true} />
-        </div>
-      </div>
-    );
-  }
-
   if (error) return <div className="error">{error}</div>;
   if (!meeting) return <div className="error">모임을 찾을 수 없습니다.</div>;
 
@@ -162,12 +152,12 @@ function MeetingDetail() {
         } else {
           alert("모임 참가 신청이 완료되었습니다!");
         }
+        navigate("/mypage");
       }
     } catch (err) {
       alert(err.message);
     } finally {
       setLoading(false);
-      navigate("/mypage");
     }
   };
 
@@ -241,6 +231,15 @@ function MeetingDetail() {
       setLoading(false);
     }
   };
+  if (loading) {
+    return (
+      <div className="meeting-detail-wrapper">
+        <div className="meeting-detail-container">
+          <Loading overlay={true} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="meeting-detail-wrapper">
@@ -274,7 +273,7 @@ function MeetingDetail() {
                 <div className="max-participants-control">
                   <input
                     type="range"
-                    min={meeting.currentParticipants}
+                    min={meeting.currentParticipants ?? 1}
                     max={10}
                     value={maxParticipants}
                     onChange={(e) => setMaxParticipants(Number(e.target.value))}
