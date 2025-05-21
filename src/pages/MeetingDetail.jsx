@@ -166,7 +166,7 @@ function MeetingDetail() {
         },
         body: JSON.stringify({
           postId: meeting.postId,
-          maxParticipants: maxParticipantsInputRef.current.value,
+          maxParticipants: maxParticipants,
           imageList: meeting.imageList,
         }),
       });
@@ -176,6 +176,19 @@ function MeetingDetail() {
       }
 
       alert("인원 변경이 완료되었습니다.");
+      // 모임 정보 새로고침
+      const updatedResponse = await fetch(
+        `${BACKEND_API_URL}/gathering/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (updatedResponse.ok) {
+        const updatedData = await updatedResponse.json();
+        setMeeting(updatedData);
+      }
     } catch (err) {
       alert(err.message);
     }
@@ -212,15 +225,15 @@ function MeetingDetail() {
               <div className="info-item">
                 <div className="max-participants-control">
                   <input
-                    ref={maxParticipantsInputRef}
                     type="range"
                     min={meeting.currentParticipants}
                     max={10}
-                    value={meeting.participantMaxNumber}
+                    value={maxParticipants}
+                    onChange={(e) => setMaxParticipants(Number(e.target.value))}
                     className="max-participants-range"
                   />
                   <span className="max-participants-value sb-14">
-                    {maxParticipantsInputRef}명
+                    {maxParticipants}명
                   </span>
                   <button
                     className="change-max-btn"
