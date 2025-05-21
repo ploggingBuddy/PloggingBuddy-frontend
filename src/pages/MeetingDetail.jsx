@@ -42,12 +42,12 @@ function MeetingDetail() {
         }
 
         const data = await response.json();
+        console.log(data);
         setMeeting(data);
         setMaxParticipants(data.maxParticipants);
       } catch (err) {
         setError(err.message);
       } finally {
-        console.log(data);
         setLoading(false);
       }
     };
