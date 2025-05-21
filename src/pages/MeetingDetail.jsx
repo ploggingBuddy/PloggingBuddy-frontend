@@ -12,6 +12,7 @@ function MeetingDetail() {
   const [currentParticipants, setCurrentParticipants] = useState(0);
   const [isCreator, setIsCreator] = useState(false);
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const [statusClass, setStatusClass] = useState("");
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -48,6 +49,13 @@ function MeetingDetail() {
         setMaxParticipants(data.participantMaxNumber);
         setIsCreator(data.isCreator);
         setCurrentParticipants(data.currentParticipants);
+        setStatusClass(
+          data.gatheringStatus === "GATHERING_CONFIRMED"
+            ? "closed"
+            : data.gatheringStatus === "GATHERING_PENDING"
+            ? "hold"
+            : ""
+        );
       } catch (err) {
         setError(err.message);
       } finally {
@@ -59,14 +67,6 @@ function MeetingDetail() {
   }, [id, navigate, BACKEND_API_URL]);
 
   if (error) return <div className="error">{error}</div>;
-
-  // meeting이 있을 때만 statusClass 계산
-  const statusClass =
-    meeting.gatheringStatus === "GATHERING_CONFIRMED"
-      ? "closed"
-      : meeting.gatheringStatus === "GATHERING_PENDING"
-      ? "hold"
-      : "";
 
   const handleJoinMeeting = async () => {
     if (!meeting) return;
