@@ -40,45 +40,6 @@
 /* =========================
    인원 변경 컨트롤
    ========================= */
-.max-participants-control {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-
-.max-participants-range {
-  width: 100px;
-  height: 4px;
-  -webkit-appearance: none;
-  border-radius: 2px;
-  outline: none;
-}
-
-.max-participants-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-.max-participants-range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-.max-participants-value {
-  min-width: 48px;
-  text-align: right;
-  color: var(--gray900);
-}
 
 .change-max-btn {
   display: inline-flex;

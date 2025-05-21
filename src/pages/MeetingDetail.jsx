@@ -167,7 +167,7 @@ function MeetingDetail() {
         body: JSON.stringify({
           postId: meeting.postId,
           maxParticipants: maxParticipantsInputRef.current.value,
-          imageList: [],
+          imageList: meeting.imageList,
         }),
       });
 
@@ -220,7 +220,7 @@ function MeetingDetail() {
                     className="max-participants-range"
                   />
                   <span className="max-participants-value sb-14">
-                    {maxParticipants}명
+                    {maxParticipantsInputRef}명
                   </span>
                   <button
                     className="change-max-btn"

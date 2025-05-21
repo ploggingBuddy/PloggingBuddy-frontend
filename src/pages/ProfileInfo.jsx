@@ -149,7 +149,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
           <label className="rg-14">지역정보</label>
           <div className="profile-field--input location-input">
             <input
-              value={tempRegion ?? address?.detailAddress}
+              value={tempRegion ?? address}
               onChange={(e) => setTempRegion(e.target.value)}
             />
             <button
