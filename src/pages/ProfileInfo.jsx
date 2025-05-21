@@ -10,6 +10,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
   const [editNickname, setEditNickname] = useState(nickname);
   const [editAddress, setEditAddress] = useState(address);
+  const [loading, setLoading] = useState(false);
 
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -20,6 +21,7 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
   };
 
   const handleNicknameEdit = async () => {
+    setLoading(true);
     const token = localStorage.getItem("kakao_token");
     if (!editNickname) {
       alert("닉네임을 입력해주세요.");
@@ -40,6 +42,8 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
       onUpdate();
     } catch (e) {
       alert(e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +72,8 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
       onUpdate();
     } catch (e) {
       alert(e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
