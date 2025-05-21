@@ -4,62 +4,66 @@ import "../css/meetingDetail.css";
 
 function MeetingDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [meeting, setMeeting] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentParticipants, setCurrentParticipants] = useState(0);
-  const [isCreator, setIsCreator] = useState(false); // 모임 생성자 여부
+  const [isCreator, setIsCreator] = useState(false);
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
-    // TODO: 백엔드에서 모임 상세정보 받아오기
-    setMeeting({
-      id,
-      title: "모임 제목 예시",
-      desc: "모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명ㅎ모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명ㅎ모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명ㅎ모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명모임 설명ㅎ",
-      images: [
-        "https://picsum.photos/400/200",
-        "https://picsum.photos/400/200",
-      ],
-      status: "모집중", // 모집중, 모집마감, 모집마감보류
-      maxParticipants: 10,
-      currentParticipants: 5,
-      date: "2024-03-20",
-      time: "14:00",
-      location: "서울시 강남구",
-      creatorId: "user123", // 모임 생성자 ID
-    });
+    const fetchMeetingDetail = async () => {
+      const token = localStorage.getItem("kakao_token");
+      if (!token) {
+        setError("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
 
-    // TODO: 실제로는 백엔드에서 현재 로그인한 사용자가 모임 생성자인지 확인
-    setIsCreator(true); // 임시로 true로 설정
-  }, [id]);
+      setLoading(true);
+      try {
+        const response = await fetch(`${BACKEND_API_URL}/gathering/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const handleJoinMeeting = () => {
-    if (!meeting) return;
-    if (currentParticipants < meeting.maxParticipants) {
-      setCurrentParticipants((prev) => prev + 1);
-    }
-  };
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem("kakao_token");
+            setError("로그인이 만료되었습니다. 다시 로그인해주세요.");
+            navigate("/login");
+            return;
+          }
+          throw new Error("모임 정보를 불러오는데 실패했습니다.");
+        }
 
-  const handleLeaveMeeting = () => {
-    if (!meeting) return;
-    if (currentParticipants > 0) {
-      setCurrentParticipants((prev) => prev - 1);
-    }
-  };
+        const data = await response.json();
+        setMeeting(data);
+        setMaxParticipants(data.maxParticipants);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        console.log(data);
+        setLoading(false);
+      }
+    };
 
-  const handleMaxParticipantsChange = (e) => {
-    const newValue = parseInt(e.target.value);
-    setMaxParticipants(newValue);
-    // TODO: 백엔드에 최대 인원 변경 요청
-  };
+    fetchMeetingDetail();
+  }, [id, navigate, BACKEND_API_URL]);
 
-  // meeting이 null일 때 로딩 표시
-  if (!meeting) return <div className="loading">로딩중...</div>;
+  if (loading) return <div className="loading">로딩중...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!meeting) return <div className="error">모임을 찾을 수 없습니다.</div>;
 
   // meeting이 있을 때만 statusClass 계산
   const statusClass =
-    meeting.status === "모집 마감"
+    meeting.gatheringStatus === "GATHERING_CONFIRMED"
       ? "closed"
-      : meeting.status === "모집 마감 보류"
+      : meeting.gatheringStatus === "GATHERING_PENDING"
       ? "hold"
       : "";
 
@@ -70,9 +74,8 @@ function MeetingDetail() {
         <main className="meeting-content">
           {/* 상태 뱃지 */}
           <div className={`meeting-status ${statusClass} rg-12`}>
-            {meeting.status}
+            {meeting.gatheringStatus}
           </div>
-
           {/* 상세 정보 */}
           <div className="meeting-info">
             <div className="info-item">
@@ -89,7 +92,7 @@ function MeetingDetail() {
                   <input
                     type="range"
                     min={meeting.currentParticipants}
-                    max={meeting.maxParticipants}
+                    max={10}
                     value={maxParticipants}
                     onChange={handleMaxParticipantsChange}
                     className="max-participants-range"
@@ -125,19 +128,21 @@ function MeetingDetail() {
 
             <div className="info-item">
               <span className="label rg-14">모집 기간</span>
-              <span className="value sb-14">{meeting.date}</span>
+              <span className="value sb-14">
+                {meeting.gatheringStartTime} ~ {meeting.gatheringEndTime}
+              </span>
             </div>
             <div className="info-item">
               <span className="label rg-14">모임 장소</span>
-              <span className="value sb-14">{meeting.location}</span>
+              <span className="value sb-14">{meeting.detailAddress}</span>
             </div>
           </div>
-
           <div className="meeting-description">
-            <p className="rg-14">{meeting.desc || "모임 설명이 없습니다."}</p>
+            <p className="rg-14">
+              {meeting.content || "모임 설명이 없습니다."}
+            </p>
           </div>
-
-          {/* 이미지 섹션 */}
+          이미지 섹션
           <div className="meeting-image-section">
             {meeting.images ? (
               <div className="image-container">
@@ -168,7 +173,6 @@ function MeetingDetail() {
               </div>
             )}
           </div>
-
           {/* 모임 생성자가 아닌 경우에만 참여하기 버튼 표시 */}
           {!isCreator && (
             <button

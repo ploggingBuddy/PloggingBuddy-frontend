@@ -11,7 +11,6 @@ function MeetingCard({
   postId,
   postStatus,
 }) {
-  // TODO: 카드 클릭 시 상세 페이지 이동 (ex: /meeting/:id)
   let statusClass = "";
   if (postStatus === "GATHERING_CONFIRMED") statusClass = "closed";
   else if (postStatus === "GATHERING_PENDING") statusClass = "hold";

@@ -1,5 +1,6 @@
 /* 카드 상태별 배경색 */
 .meeting-status {
+  width: fit-content;
   display: inline-flex;
   padding: 4px 8px;
   justify-content: center;
