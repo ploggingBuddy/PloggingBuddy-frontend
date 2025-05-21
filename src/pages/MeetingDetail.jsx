@@ -107,6 +107,7 @@ function MeetingDetail() {
         }
         throw new Error("모임 참가 신청에 실패했습니다.");
       }
+
       // 모임 정보 새로고침
       const updatedResponse = await fetch(
         `${BACKEND_API_URL}/gathering/${id}`,
@@ -133,7 +134,7 @@ function MeetingDetail() {
               },
               body: JSON.stringify({
                 postId: id,
-                gatheringStatus: meeting.gatheringStatus,
+                gatheringStatus: updatedData.gatheringStatus,
               }),
             }
           );
