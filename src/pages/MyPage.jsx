@@ -59,7 +59,7 @@ function MyPage() {
       <div className="mypage-container">
         <ActivityTab tab={tab} setTab={setTab} />
         {tab === "profile" ? (
-          <ProfileInfo />
+          <ProfileInfo userData={userData} />
         ) : (
           <div className="meeting-card-list-container">
             <MeetingCardList

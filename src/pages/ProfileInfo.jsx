@@ -5,8 +5,7 @@ import MapModal from "../components/MapModal";
 import editIcon from "../assets/edit.svg";
 import mapIcon from "../assets/solar_map-linear.png";
 
-function ProfileInfo() {
-  const [userData, setUserData] = useState(null);
+function ProfileInfo({ userData }) {
   const [loading, setLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
@@ -40,7 +39,7 @@ function ProfileInfo() {
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
-        setUserData(data);
+        userData = data;
         setTempNickname(data.nickname);
         setTempRegion(data.detailAddress);
         if (data.address) {
@@ -57,8 +56,9 @@ function ProfileInfo() {
         setIsDirty(false);
       }
     };
-
-    fetchUserData();
+    if (isDirty) {
+      fetchUserData();
+    }
   }, [isDirty, BACKEND_API_URL]);
 
   const handleNicknameEdit = async () => {
