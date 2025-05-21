@@ -172,23 +172,6 @@
   gap: 8px;
 }
 
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.card-location {
-  display: flex;
-  align-items: center;
-}
-.card-location > img {
-  width: 16px;
-  height: 16px;
-  aspect-ratio: 1/1;
-  margin-right: 8px;
-}
-
 .card-desc {
   display: -webkit-box;
   -webkit-line-clamp: 2; /* 최대 2줄 */
@@ -198,11 +181,4 @@
   color: var(--gray400);
   line-height: 1.4;
   height: calc(1.4em * 2); /* 2줄 높이 고정 */
-}
-
-.card-img {
-  width: 100%;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 4px;
 }

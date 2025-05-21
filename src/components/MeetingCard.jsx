@@ -1,4 +1,3 @@
-import locationIcon from "../assets/location.png";
 import { useNavigate } from "react-router-dom";
 
 function MeetingCard({
@@ -25,19 +24,16 @@ function MeetingCard({
     >
       <div className="card-title sb-16">{gatheringName}</div>
       <div className="card-content">
-        <div className="card-meta">
-          <div className={`meeting-status ${statusClass} rg-12`}>
-            {postStatus === "GATHERING_CONFIRMED" ? "모집 완료" : "모집 중"}
-          </div>
-          <span className="rg-14">최대 {participantMaxNumber}명</span>
-          <span className="rg-14">{gatheringEndTime}</span>
+        <div className={`meeting-status ${statusClass} rg-12`}>
+          {postStatus === "GATHERING_CONFIRMED" ? "모집 완료" : "모집 중"}
         </div>
-        <div className="card-location">
-          <img src={locationIcon} alt="위치" />
-          <span className="rg-14">{detailAddress}</span>
-        </div>
+        <span className="rg-14">
+          현재 참여 인원: {participantCurrentNumber}/{participantMaxNumber}명
+        </span>
+        <span className="rg-14">모집 기한 {gatheringEndTime}</span>
+        <span className="rg-14">모임 장소: {detailAddress}</span>
+        <span className="rg-14">모임 시간: {gatheringStartTime}</span>
         <div className="card-desc rg-14">{content}</div>
-        {/* <img src={img} alt="썸네일" className="card-img" /> */}
       </div>
     </div>
   );
