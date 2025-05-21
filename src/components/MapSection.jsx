@@ -6,14 +6,34 @@ const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
 function MapSection() {
   const navigate = useNavigate();
-  const [meetups, setMeetups] = useState([]);
   const token = localStorage.getItem("kakao_token");
 
-  // 1. 실제 백엔드에서 모집 모임 리스트 가져오기
+  const [meetups, setMeetups] = useState([]);
+  const [userPosition, setUserPosition] = useState({
+    lat: 37.5665,
+    lng: 126.978, // 기본 위치: 서울 시청
+  });
+
+  // ✅ 1. 사용자 위치 확인 (최초 1회만 실행)
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserPosition({ lat, lng });
+        },
+        (err) => {
+          console.warn("GPS 허용 안됨, 기본 위치 사용");
+        }
+      );
+    }
+  }, []);
+
+  // ✅ 2. 위치 기반 모집 글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
-      const lat = 37.56367012895697;
-      const lng = 126.97561977957132;
+      const { lat, lng } = userPosition;
 
       try {
         const response = await fetch(
@@ -32,9 +52,9 @@ function MapSection() {
     };
 
     fetchMeetups();
-  }, [token]);
+  }, [userPosition, token]);
 
-  // 2. 지도 로딩 및 마커+오버레이 구성
+  // ✅ 3. 지도 로딩 및 마커 + 오버레이 구성
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
@@ -45,11 +65,12 @@ function MapSection() {
       window.kakao.maps.load(() => {
         const container = document.getElementById("map");
         const options = {
-          center: new window.kakao.maps.LatLng(37.56367012895697, 126.97561977957132),
+          center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
           level: 5,
         };
 
         const map = new window.kakao.maps.Map(container, options);
+
         const markerImage = new window.kakao.maps.MarkerImage(
           "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
           new window.kakao.maps.Size(25, 41),
@@ -130,7 +151,7 @@ function MapSection() {
       const existing = document.querySelector('script[src*="dapi.kakao.com"]');
       if (existing) document.head.removeChild(existing);
     };
-  }, [meetups, navigate, token]);
+  }, [meetups, navigate, token, userPosition]);
 
   return (
     <div
