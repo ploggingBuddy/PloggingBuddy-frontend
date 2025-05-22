@@ -46,7 +46,7 @@ function MainPage() {
   }
 
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       {showAddressPrompt && (
         <div
           style={{
@@ -65,8 +65,21 @@ function MainPage() {
         </div>
       )}
 
-      {/* 로딩 중에는 UI 위에 오버레이로 로딩 띄움 */}
-      {isLoading && <Loading overlay={true} />}
+      {/* 항상 렌더링하고 로딩 시 오버레이만 위에 올림 */}
+      {isLoading && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            zIndex: 9998,
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <Loading overlay={true} />
+        </div>
+      )}
 
       <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto", opacity: isLoading ? 0.5 : 1 }}>
         <h2>모임</h2>
@@ -82,7 +95,6 @@ function MainPage() {
           {isLoggedIn && <CreateButton />}
         </div>
 
-        {/* 지도는 항상 렌더링 */}
         <MapSection onMapLoaded={handleMapLoaded} />
       </div>
     </div>
