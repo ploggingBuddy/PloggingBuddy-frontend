@@ -112,7 +112,9 @@ function MapSection({ onMapLoaded }) {
   useEffect(() => {
     const renderMap = async () => {
       try {
+        console.log("📍 renderMap 실행됨");
         await loadKakaoSDK();
+
         const container = document.getElementById("map");
         if (!container) {
           console.warn("❗ map container 없음");
@@ -125,8 +127,8 @@ function MapSection({ onMapLoaded }) {
           level: 5,
         });
 
-        // 마커 생략 가능
-        onMapLoaded?.(); // ✅ 지도 로딩 완료 후 반드시 호출
+        console.log("🗺️ 지도 생성 완료");
+        onMapLoaded?.(); // ✅ 반드시 호출
         console.log("✅ onMapLoaded 호출 완료");
       } catch (err) {
         console.error("❌ 지도 렌더링 실패", err);
@@ -135,7 +137,7 @@ function MapSection({ onMapLoaded }) {
     };
 
     renderMap();
-  }, [meetups, userPosition]);
+  }, [userPosition]); // ✅ meetups 제거로 무한 로딩 방지
 
   return (
     <div
