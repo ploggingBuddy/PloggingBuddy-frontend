@@ -19,16 +19,18 @@ function MainPage() {
     if (!hasAddress) {
       setShowAddressPrompt(true);
     }
-    setLoadingUser(false); // ✅ 사용자 정보 로딩 완료
+    console.log("✅ 사용자 주소 체크 완료");
+    setLoadingUser(false);
   };
 
   const handleMapLoaded = () => {
-    setLoadingMap(false); // ✅ 지도 로딩 완료
+    console.log("✅ 지도 로딩 완료");
+    setLoadingMap(false);
   };
 
   useEffect(() => {
     if (!isLoggedIn) {
-      setLoadingUser(false); // 로그인 안 되어 있으면 로딩 안 함
+      setLoadingUser(false);
       setLoadingMap(false);
     }
   }, [isLoggedIn]);
