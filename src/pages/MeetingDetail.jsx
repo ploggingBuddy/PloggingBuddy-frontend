@@ -137,20 +137,9 @@ function MeetingDetail() {
         throw new Error("모임 참가 신청에 실패했습니다.");
       }
 
-      // 모임 정보 새로고침
-      const updatedResponse = await fetch(
-        `${BACKEND_API_URL}/gathering/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (updatedResponse.ok) {
-        const updatedData = await updatedResponse.json();
-        setMeeting(updatedData);
-      }
+      alert("모임 참가 신청이 완료되었습니다!");
+      // 모임 정보 새로고침을 위해 현재 페이지를 다시 로드
+      window.location.reload();
     } catch (err) {
       alert(err.message);
     } finally {
@@ -317,11 +306,13 @@ function MeetingDetail() {
             </p>
           </div>
           {/* 모임 생성자가 아니고, 아직 신청하지 않은 경우에만 참여하기 버튼 표시 */}
-          {isCreator && !isEnrolled && (
-            <button className="join-meeting-btn" onClick={handleJoinMeeting}>
-              <span className="sb-14">신청하기</span>
-            </button>
-          )}
+          {isCreator &&
+            !isEnrolled &&
+            !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
+              <button className="join-meeting-btn" onClick={handleJoinMeeting}>
+                <span className="sb-14">신청하기</span>
+              </button>
+            )}
           {isCreator && !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
             <div>
               <button
