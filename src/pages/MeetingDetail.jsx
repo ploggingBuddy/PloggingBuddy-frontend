@@ -150,7 +150,43 @@ function MeetingDetail() {
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
         setMeeting(updatedData);
-        alert("모임 참가 신청이 완료되었습니다!");
+
+        // 참가자 수가 최대 인원에 도달했는지 확인
+        if (updatedData.enrolledCount === updatedData.participantMaxNumber) {
+          // 조기마감 API 호출
+          const finishResponse = await fetch(
+            `${BACKEND_API_URL}/gathering/gathering-finish/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!finishResponse.ok) {
+            throw new Error("모임 마감 처리에 실패했습니다.");
+          }
+
+          // 마감 처리 후 다시 한번 모임 정보 새로고침
+          const finalResponse = await fetch(
+            `${BACKEND_API_URL}/gathering/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (finalResponse.ok) {
+            const finalData = await finalResponse.json();
+            setMeeting(finalData);
+            alert("모임 참가 신청이 완료되었습니다! 모임이 마감되었습니다.");
+          }
+        } else {
+          alert("모임 참가 신청이 완료되었습니다!");
+        }
         navigate("/mypage");
       }
     } catch (err) {
