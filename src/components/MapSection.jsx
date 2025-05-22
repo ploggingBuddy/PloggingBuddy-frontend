@@ -14,7 +14,7 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ 주소 → 좌표 변환 흐름
+  // ✅ 주소 기반 좌표 설정
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -24,15 +24,17 @@ function MapSection() {
           },
         });
         const data = await res.json();
-        const address = data.detailAddress;
-        console.log("📦 받아온 detailAddress:", address);
+        const rawAddress = data.detailAddress;
+        console.log("📦 받아온 detailAddress:", rawAddress);
 
-        if (address && address.trim() !== "") {
+        if (rawAddress && rawAddress.trim() !== "") {
+          const simplifiedAddress = rawAddress.split(" ").slice(0, 3).join(" ");
+          console.log("🔍 검색용 주소:", simplifiedAddress);
+
           loadKakaoMapSDK(() => {
             waitForGeocoder(() => {
-              console.log("🛰 Geocoder 로드 완료, 주소 검색 시작");
               const geocoder = new window.kakao.maps.services.Geocoder();
-              geocoder.addressSearch(address, (result, status) => {
+              geocoder.addressSearch(simplifiedAddress, (result, status) => {
                 console.log("🧭 지오코딩 결과:", result, "상태:", status);
                 if (
                   status === window.kakao.maps.services.Status.OK &&
