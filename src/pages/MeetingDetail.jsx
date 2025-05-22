@@ -59,41 +59,26 @@ function MeetingDetail() {
         );
 
         try {
-          // 참가자 목록 가져오기
-          const enrolledResponse = await fetch(
-            `${BACKEND_API_URL}/enroll/enrolled-list/${id}`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          // 현재 사용자의 정보 가져오기
+          const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-          if (enrolledResponse.ok) {
-            const enrolledData = await enrolledResponse.json();
-            // 현재 사용자의 정보 가져오기
-            const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              // 참가자 목록에서 현재 사용자가 있는지 확인
-              const isUserEnrolled = enrolledData.enrollmentDataDataList.some(
-                (enrollment) => enrollment.name === userData.nickname
-              );
-              setIsEnrolled(isUserEnrolled);
-            }
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            // pendingPosts 배열에서 현재 모임의 postId가 있는지 확인
+            const isUserEnrolled = userData.pendingPosts.some(
+              (post) => post.postId === parseInt(id)
+            );
+            setIsEnrolled(isUserEnrolled);
           }
         } catch (enrolledError) {
           console.error(
-            "참가자 목록을 가져오는데 실패했습니다:",
+            "사용자 정보를 가져오는데 실패했습니다:",
             enrolledError
           );
-          // 참가자 목록 조회 실패 시 기본값으로 설정
           setIsEnrolled(false);
         }
       } catch (err) {
@@ -242,10 +227,12 @@ function MeetingDetail() {
           </div>
           {/* 상세 정보 */}
           <div className="meeting-info">
-            <div className="info-item">
-              <span className="label rg-14">생성자: </span>
-              <span className="value sb-14">{meeting.leadUserNickname}</span>
-            </div>
+            {!isCreator && (
+              <div className="info-item">
+                <span className="label rg-14">생성자: </span>
+                <span className="value sb-14">{meeting.leadUserNickname}</span>
+              </div>
+            )}
             <div className="info-item">
               <span className="label rg-14">참여 인원</span>
               <span className="value sb-14">
@@ -255,7 +242,8 @@ function MeetingDetail() {
 
             {/* 모임 생성자인 경우에만 인원 변경 버튼 표시 */}
             {isCreator &&
-              !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
+              !meeting.gatheringStatus === "GATHERING_CONFIRMED" &&
+              isEnrolled && (
                 <div className="info-item">
                   <div className="max-participants-control">
                     <input
@@ -280,13 +268,14 @@ function MeetingDetail() {
                   </div>
                 </div>
               )}
-
-            <div className="info-item">
-              <span className="label rg-14">모집 기간</span>
-              <span className="value sb-14">
-                {formatDate(meeting.gatheringEndTime)}
-              </span>
-            </div>
+            {!meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
+              <div className="info-item">
+                <span className="label rg-14">모집 기간</span>
+                <span className="value sb-14">
+                  {formatDate(meeting.gatheringEndTime)}
+                </span>
+              </div>
+            )}
             <div className="info-item">
               <span className="label rg-14">모임 장소</span>
               <span className="value sb-14">
@@ -306,7 +295,7 @@ function MeetingDetail() {
             </p>
           </div>
           {/* 모임 생성자가 아니고, 아직 신청하지 않은 경우에만 참여하기 버튼 표시 */}
-          {isCreator &&
+          {!isCreator &&
             !isEnrolled &&
             !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
               <button className="join-meeting-btn" onClick={handleJoinMeeting}>
