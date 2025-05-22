@@ -1,6 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const MapModal = ({ onClose, onSelect }) => {
+  const [userPosition, setUserPosition] = useState({
+    lat: 37.5665,
+    lng: 126.978, // 기본 위치: 서울 시청
+  });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserPosition({ lat, lng });
+        },
+        (err) => {
+          console.warn("GPS 허용 안됨, 기본 위치 사용");
+        }
+      );
+    }
+  }, []);
+
   useEffect(() => {
     const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
@@ -53,7 +73,7 @@ const MapModal = ({ onClose, onSelect }) => {
       window.kakao.maps.load(async () => {
         await waitForKakaoReady();
         await waitForMapDiv();
-        initMap();
+        initMap(); // 위치 설정된 후에 지도 초기화
       });
     };
 
@@ -63,14 +83,14 @@ const MapModal = ({ onClose, onSelect }) => {
       const mapContainer = document.getElementById("map");
       if (mapContainer) mapContainer.innerHTML = "";
     };
-  }, []);
+  }, [userPosition]); // 📌 사용자 위치가 바뀌면 다시 초기화
 
   const initMap = () => {
     const container = document.getElementById("map");
     if (!container) return;
 
     const options = {
-      center: new window.kakao.maps.LatLng(37.5665, 126.978),
+      center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
       level: 3,
     };
 
