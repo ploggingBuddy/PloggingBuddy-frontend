@@ -14,7 +14,7 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ 주소 기반 좌표 설정
+  // ✅ 1. 주소 → 좌표 변환 흐름
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -33,22 +33,35 @@ function MapSection() {
 
           loadKakaoMapSDK(() => {
             waitForGeocoder(() => {
-              const geocoder = new window.kakao.maps.services.Geocoder();
-              geocoder.addressSearch(simplifiedAddress, (result, status) => {
-                console.log("🧭 지오코딩 결과:", result, "상태:", status);
-                if (
-                  status === window.kakao.maps.services.Status.OK &&
-                  result.length > 0
-                ) {
-                  const lat = parseFloat(result[0].y);
-                  const lng = parseFloat(result[0].x);
-                  console.log("📌 좌표 설정:", { lat, lng });
-                  setUserPosition({ lat, lng });
-                } else {
-                  console.warn("❌ 주소 변환 실패 → fallback to GPS");
+              try {
+                const geocoder = new window.kakao.maps.services.Geocoder();
+                if (!geocoder) {
+                  console.error("❌ Geocoder 생성 실패");
                   fallbackToGPS();
+                  return;
                 }
-              });
+
+                geocoder.addressSearch(simplifiedAddress, (result, status) => {
+                  console.log("🧭 지오코딩 결과:", result, "상태:", status);
+
+                  if (
+                    status === window.kakao.maps.services.Status.OK &&
+                    result.length > 0
+                  ) {
+                    const lat = parseFloat(result[0].y);
+                    const lng = parseFloat(result[0].x);
+                    console.log("📌 좌표 설정:", { lat, lng });
+                    setUserPosition({ lat, lng });
+                  } else {
+                    console.warn("❌ 주소 변환 실패 → fallback to GPS");
+                    console.warn("🔍 실패 원인 result:", result, "status:", status);
+                    fallbackToGPS();
+                  }
+                });
+              } catch (error) {
+                console.error("🔴 지오코딩 중 예외 발생:", error);
+                fallbackToGPS();
+              }
             });
           });
         } else {
@@ -118,12 +131,13 @@ function MapSection() {
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 모집 글 가져오기
+  // ✅ 2. 모집 글 로드
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
+
       try {
-        const res = await fetch(
+        const response = await fetch(
           `${BACKEND_API_URL}/gathering/spot/${lat}/${lng}`,
           {
             headers: {
@@ -131,18 +145,18 @@ function MapSection() {
             },
           }
         );
-        const data = await res.json();
+        const data = await response.json();
         setMeetups(data.gatheringPreviewList || []);
         console.log("📊 모집 글 수:", data.gatheringPreviewList?.length ?? 0);
-      } catch (err) {
-        console.error("❌ 모임 데이터 요청 실패:", err);
+      } catch (error) {
+        console.error("모임 데이터 요청 실패:", error);
       }
     };
 
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 지도 & 마커 표시
+  // ✅ 3. 지도 + 마커 + 오버레이 표시
   useEffect(() => {
     const loadMap = () => {
       const container = document.getElementById("map");
@@ -152,10 +166,7 @@ function MapSection() {
       }
 
       const options = {
-        center: new window.kakao.maps.LatLng(
-          userPosition.lat,
-          userPosition.lng
-        ),
+        center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
         level: 5,
       };
 
@@ -172,10 +183,7 @@ function MapSection() {
       meetups.forEach((item) => {
         const marker = new window.kakao.maps.Marker({
           map,
-          position: new window.kakao.maps.LatLng(
-            item.latitude,
-            item.longitude
-          ),
+          position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
           image: markerImage,
         });
 
@@ -183,14 +191,11 @@ function MapSection() {
           if (currentOverlay) currentOverlay.setMap(null);
 
           try {
-            const res = await fetch(
-              `${BACKEND_API_URL}/gathering/${item.gatheringPostId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+            const res = await fetch(`${BACKEND_API_URL}/gathering/${item.gatheringPostId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
             const detail = await res.json();
 
             const endDate = new Date(detail.gatheringEndTime);
@@ -225,9 +230,7 @@ function MapSection() {
             currentOverlay = overlay;
 
             setTimeout(() => {
-              const btn = document.getElementById(
-                `btn-${item.gatheringPostId}`
-              );
+              const btn = document.getElementById(`btn-${item.gatheringPostId}`);
               if (btn) {
                 btn.onclick = () => {
                   navigate(`/meeting/${item.gatheringPostId}`);
@@ -251,9 +254,7 @@ function MapSection() {
     document.head.appendChild(script);
 
     return () => {
-      const existing = document.querySelector(
-        'script[src*="dapi.kakao.com"]'
-      );
+      const existing = document.querySelector('script[src*="dapi.kakao.com"]');
       if (existing) document.head.removeChild(existing);
     };
   }, [meetups, userPosition]);
