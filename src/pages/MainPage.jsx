@@ -1,47 +1,19 @@
-import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import React, { useState } from "react";
 import UserInfo from "../components/UserInfo";
 import MapSection from "../components/MapSection";
 import CreateButton from "../components/CreateButton";
-import Loading from "../components/Loading";
 
 function MainPage() {
   const { isLoggedIn } = useAuth();
   const token = localStorage.getItem("kakao_token");
-
   const [showAddressPrompt, setShowAddressPrompt] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [mapReady, setMapReady] = useState(false);
 
   const handleAddressCheck = (hasAddress) => {
     if (!hasAddress) {
       setShowAddressPrompt(true);
     }
-    console.log("✅ 사용자 주소 체크 완료");
-    setLoadingUser(false);
   };
-
-  const handleMapLoaded = () => {
-    console.log("✅ 지도 로딩 완료");
-    setMapReady(true);
-  };
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setLoadingUser(false);
-      setMapReady(true); // 로그인 안 되어도 로딩 종료
-    }
-  }, [isLoggedIn]);
-
-  if (loadingUser || !mapReady) {
-    return (
-      <div className="meeting-detail-wrapper">
-        <div className="meeting-detail-container">
-          <Loading overlay={true} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -75,7 +47,7 @@ function MainPage() {
           {token && <UserInfo onAddressCheck={handleAddressCheck} />}
           {isLoggedIn && <CreateButton />}
         </div>
-        <MapSection onMapLoaded={handleMapLoaded} />
+        <MapSection />
       </div>
     </div>
   );
