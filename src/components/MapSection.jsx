@@ -14,7 +14,7 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ 사용자 주소 기반 좌표 설정
+  // ✅ 주소 → 좌표 변환 흐름
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -25,47 +25,55 @@ function MapSection() {
         });
         const data = await res.json();
         const address = data.detailAddress;
+        console.log("📦 받아온 detailAddress:", address);
 
         if (address && address.trim() !== "") {
           loadKakaoMapSDK(() => {
             waitForGeocoder(() => {
+              console.log("🛰 Geocoder 로드 완료, 주소 검색 시작");
               const geocoder = new window.kakao.maps.services.Geocoder();
               geocoder.addressSearch(address, (result, status) => {
+                console.log("🧭 지오코딩 결과:", result, "상태:", status);
                 if (
                   status === window.kakao.maps.services.Status.OK &&
                   result.length > 0
                 ) {
-                  setUserPosition({
-                    lat: parseFloat(result[0].y),
-                    lng: parseFloat(result[0].x),
-                  });
+                  const lat = parseFloat(result[0].y);
+                  const lng = parseFloat(result[0].x);
+                  console.log("📌 좌표 설정:", { lat, lng });
+                  setUserPosition({ lat, lng });
                 } else {
-                  console.warn("주소 → 좌표 변환 실패");
+                  console.warn("❌ 주소 변환 실패 → fallback to GPS");
                   fallbackToGPS();
                 }
               });
             });
           });
         } else {
+          console.warn("⚠️ detailAddress 없음 → fallback to GPS");
           fallbackToGPS();
         }
       } catch (err) {
-        console.warn("사용자 정보 불러오기 실패");
+        console.warn("🔴 사용자 정보 불러오기 실패:", err);
         fallbackToGPS();
       }
     };
 
     const fallbackToGPS = () => {
       if (navigator.geolocation) {
+        console.log("📡 GPS 위치 요청 시작");
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            setUserPosition({
+            const coords = {
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
-            });
+            };
+            console.log("✅ GPS 위치 획득:", coords);
+            setUserPosition(coords);
           },
           () => {
-            setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 시청
+            console.warn("🆘 GPS 실패 → 서울 시청으로 fallback");
+            setUserPosition({ lat: 37.5665, lng: 126.978 });
           }
         );
       } else {
@@ -79,10 +87,12 @@ function MapSection() {
         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
         script.async = true;
         script.onload = () => {
+          console.log("✅ Kakao SDK 로드 완료");
           window.kakao.maps.load(onLoad);
         };
         document.head.appendChild(script);
       } else {
+        console.log("🟡 Kakao SDK 이미 로드됨");
         window.kakao.maps.load(onLoad);
       }
     };
@@ -106,7 +116,7 @@ function MapSection() {
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 모집 글 불러오기
+  // ✅ 모집 글 가져오기
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
@@ -121,18 +131,24 @@ function MapSection() {
         );
         const data = await res.json();
         setMeetups(data.gatheringPreviewList || []);
+        console.log("📊 모집 글 수:", data.gatheringPreviewList?.length ?? 0);
       } catch (err) {
-        console.error("모임 데이터 요청 실패:", err);
+        console.error("❌ 모임 데이터 요청 실패:", err);
       }
     };
 
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 지도 + 마커 + 오버레이 표시
+  // ✅ 지도 & 마커 표시
   useEffect(() => {
     const loadMap = () => {
       const container = document.getElementById("map");
+      if (!container) {
+        console.error("❌ map div 없음");
+        return;
+      }
+
       const options = {
         center: new window.kakao.maps.LatLng(
           userPosition.lat,
@@ -217,7 +233,7 @@ function MapSection() {
               }
             }, 0);
           } catch (err) {
-            console.error("상세 정보 요청 실패:", err);
+            console.error("❌ 상세 정보 요청 실패:", err);
           }
         });
       });
@@ -227,6 +243,7 @@ function MapSection() {
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
     script.async = true;
     script.onload = () => {
+      console.log("🗺 Kakao 지도 SDK (기본) 로드 완료");
       window.kakao.maps.load(loadMap);
     };
     document.head.appendChild(script);
