@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-function MapSection() {
+function MapSection({ onMapLoaded }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("kakao_token");
 
@@ -14,10 +14,9 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ Kakao SDK 로드 함수 (최초 한 번만)
   const loadKakaoSDK = () =>
     new Promise((resolve) => {
-      if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+      if (window.kakao?.maps?.services) {
         resolve();
         return;
       }
@@ -36,7 +35,6 @@ function MapSection() {
       }
     });
 
-  // ✅ fallback: GPS → 서울 시청
   const fallbackToGPS = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -55,7 +53,6 @@ function MapSection() {
     }
   };
 
-  // ✅ 주소 → 좌표 변환
   useEffect(() => {
     const getUserPositionFromAddress = async () => {
       try {
@@ -94,7 +91,6 @@ function MapSection() {
     getUserPositionFromAddress();
   }, [token]);
 
-  // ✅ 모집글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
       try {
@@ -113,74 +109,86 @@ function MapSection() {
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 지도 및 마커 렌더링
   useEffect(() => {
     const renderMap = async () => {
-      await loadKakaoSDK();
+      try {
+        await loadKakaoSDK();
 
-      const container = document.getElementById("map");
-      if (!container) return;
+        const container = document.getElementById("map");
+        if (!container) return;
 
-      const map = new window.kakao.maps.Map(container, {
-        center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
-        level: 5,
-      });
-
-      const markerImage = new window.kakao.maps.MarkerImage(
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-        new window.kakao.maps.Size(25, 41),
-        { offset: new window.kakao.maps.Point(12, 41) }
-      );
-
-      let currentOverlay = null;
-
-      meetups.forEach((item) => {
-        const marker = new window.kakao.maps.Marker({
-          map,
-          position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
-          image: markerImage,
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
+          level: 5,
         });
 
-        window.kakao.maps.event.addListener(marker, "click", async () => {
-          if (currentOverlay) currentOverlay.setMap(null);
+        const markerImage = new window.kakao.maps.MarkerImage(
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+          new window.kakao.maps.Size(25, 41),
+          { offset: new window.kakao.maps.Point(12, 41) }
+        );
 
-          try {
-            const res = await fetch(`${BACKEND_API_URL}/gathering/${item.gatheringPostId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const detail = await res.json();
-            const endDate = new Date(detail.gatheringEndTime);
+        let currentOverlay = null;
 
-            const content = `
-              <div style="width: 260px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: sans-serif;">
-                <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px;">${detail.title}</div>
-                <span style="display: inline-block; background: #e0f2ff; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-size: 12px;">모집 중</span>
-                <div style="font-size: 14px; margin: 6px 0;">최대 인원: ${detail.participantMaxNumber}명</div>
-                <div style="font-size: 14px;">모집 마감일: ${endDate.getMonth() + 1}/${endDate.getDate()}</div>
-                <div style="font-size: 14px; margin-bottom: 8px;">📍 ${detail.address}</div>
-                <button id="btn-${item.gatheringPostId}" style="width: 100%; padding: 10px; background: #dcedc8; border: none; border-radius: 6px; font-weight: bold;">상세 정보 보기</button>
-              </div>
-            `;
+        meetups.forEach((item) => {
+          const marker = new window.kakao.maps.Marker({
+            map,
+            position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
+            image: markerImage,
+          });
 
-            const overlay = new window.kakao.maps.CustomOverlay({
-              content,
-              position: marker.getPosition(),
-              yAnchor: 1.4,
-            });
-            overlay.setMap(map);
-            currentOverlay = overlay;
+          window.kakao.maps.event.addListener(marker, "click", async () => {
+            if (currentOverlay) currentOverlay.setMap(null);
 
-            setTimeout(() => {
-              const btn = document.getElementById(`btn-${item.gatheringPostId}`);
-              if (btn) {
-                btn.onclick = () => navigate(`/meeting/${item.gatheringPostId}`);
-              }
-            }, 0);
-          } catch (err) {
-            console.error("❌ 상세 데이터 로드 실패", err);
-          }
+            try {
+              const res = await fetch(`${BACKEND_API_URL}/gathering/${item.gatheringPostId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              const detail = await res.json();
+              const endDate = new Date(detail.gatheringEndTime);
+
+              const content = `
+                <div style="width: 260px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: sans-serif;">
+                  <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px;">${detail.title}</div>
+                  <span style="display: inline-block; background: #e0f2ff; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-size: 12px;">모집 중</span>
+                  <div style="font-size: 14px; margin: 6px 0;">최대 인원: ${detail.participantMaxNumber}명</div>
+                  <div style="font-size: 14px;">모집 마감일: ${endDate.getMonth() + 1}/${endDate.getDate()}</div>
+                  <div style="font-size: 14px; margin-bottom: 8px;">📍 ${detail.address}</div>
+                  <button id="btn-${item.gatheringPostId}" style="width: 100%; padding: 10px; background: #dcedc8; border: none; border-radius: 6px; font-weight: bold;">상세 정보 보기</button>
+                </div>
+              `;
+
+              const overlay = new window.kakao.maps.CustomOverlay({
+                content,
+                position: marker.getPosition(),
+                yAnchor: 1.4,
+              });
+              overlay.setMap(map);
+              currentOverlay = overlay;
+
+              setTimeout(() => {
+                const btn = document.getElementById(`btn-${item.gatheringPostId}`);
+                if (btn) {
+                  btn.onclick = () => navigate(`/meeting/${item.gatheringPostId}`);
+                }
+              }, 0);
+            } catch (err) {
+              console.error("❌ 상세 데이터 로드 실패", err);
+            }
+          });
         });
-      });
+
+        // ✅ 지도 렌더링 완료 후 로딩 종료
+        if (typeof onMapLoaded === "function") {
+          onMapLoaded();
+        }
+
+      } catch (err) {
+        console.error("❌ 지도 렌더링 중 오류 발생", err);
+        if (typeof onMapLoaded === "function") {
+          onMapLoaded(); // 실패하더라도 반드시 로딩 종료
+        }
+      }
     };
 
     renderMap();
