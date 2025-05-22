@@ -64,7 +64,11 @@ function MainPage() {
           🚨 주소 정보가 없습니다. [프로필 → 주소 등록]을 먼저 완료해주세요.
         </div>
       )}
-      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
+
+      {/* 로딩 중에는 UI 위에 오버레이로 로딩 띄움 */}
+      {isLoading && <Loading overlay={true} />}
+
+      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto", opacity: isLoading ? 0.5 : 1 }}>
         <h2>모임</h2>
         <div
           style={{
@@ -77,10 +81,13 @@ function MainPage() {
           {token && <UserInfo onAddressCheck={handleAddressCheck} />}
           {isLoggedIn && <CreateButton />}
         </div>
+
+        {/* 지도는 항상 렌더링 */}
         <MapSection onMapLoaded={handleMapLoaded} />
       </div>
     </div>
   );
+
 }
 
 export default MainPage;

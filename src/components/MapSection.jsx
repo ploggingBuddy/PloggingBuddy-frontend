@@ -118,9 +118,10 @@ function MapSection({ onMapLoaded }) {
         const container = document.getElementById("map");
         if (!container) {
           console.warn("❗ map container 없음");
-          onMapLoaded?.();
+          onMapLoaded?.();  // ✅ 무조건 호출
           return;
         }
+
 
         const map = new window.kakao.maps.Map(container, {
           center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
