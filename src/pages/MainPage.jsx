@@ -25,7 +25,7 @@ function MainPage() {
             padding: "20px",
             textAlign: "center",
             position: "fixed",
-            top: 0,
+            bottom: 0,
             left: 0,
             width: "100%",
             zIndex: 9999,
