@@ -118,10 +118,9 @@ function MapSection({ onMapLoaded }) {
         const container = document.getElementById("map");
         if (!container) {
           console.warn("❗ map container 없음");
-          onMapLoaded?.();  // ✅ 무조건 호출
+          onMapLoaded?.(); // 무조건 호출
           return;
         }
-
 
         const map = new window.kakao.maps.Map(container, {
           center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
@@ -129,16 +128,16 @@ function MapSection({ onMapLoaded }) {
         });
 
         console.log("🗺️ 지도 생성 완료");
-        onMapLoaded?.(); // ✅ 반드시 호출
+        onMapLoaded?.(); // 지도 생성 성공 후 호출
         console.log("✅ onMapLoaded 호출 완료");
       } catch (err) {
         console.error("❌ 지도 렌더링 실패", err);
-        onMapLoaded?.();
+        onMapLoaded?.(); // 실패해도 로딩 종료
       }
     };
 
     renderMap();
-  }, [userPosition]); // ✅ meetups 제거로 무한 로딩 방지
+  }, [userPosition]);
 
   return (
     <div

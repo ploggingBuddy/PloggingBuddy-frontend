@@ -11,9 +11,7 @@ function MainPage() {
 
   const [showAddressPrompt, setShowAddressPrompt] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [loadingMap, setLoadingMap] = useState(true);
-
-  const isLoading = isLoggedIn && (loadingUser || loadingMap);
+  const [mapReady, setMapReady] = useState(false);
 
   const handleAddressCheck = (hasAddress) => {
     if (!hasAddress) {
@@ -25,17 +23,17 @@ function MainPage() {
 
   const handleMapLoaded = () => {
     console.log("✅ 지도 로딩 완료");
-    setLoadingMap(false);
+    setMapReady(true);
   };
 
   useEffect(() => {
     if (!isLoggedIn) {
       setLoadingUser(false);
-      setLoadingMap(false);
+      setMapReady(true); // 로그인 안 되어도 로딩 종료
     }
   }, [isLoggedIn]);
 
-  if (isLoading) {
+  if (loadingUser || !mapReady) {
     return (
       <div className="meeting-detail-wrapper">
         <div className="meeting-detail-container">
@@ -46,7 +44,7 @@ function MainPage() {
   }
 
   return (
-    <div style={{ position: "relative" }}>
+    <div>
       {showAddressPrompt && (
         <div
           style={{
@@ -64,24 +62,7 @@ function MainPage() {
           🚨 주소 정보가 없습니다. [프로필 → 주소 등록]을 먼저 완료해주세요.
         </div>
       )}
-
-      {/* 항상 렌더링하고 로딩 시 오버레이만 위에 올림 */}
-      {isLoading && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 9998,
-            width: "100%",
-            height: "100%",
-          }}
-        >
-          <Loading overlay={true} />
-        </div>
-      )}
-
-      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto", opacity: isLoading ? 0.5 : 1 }}>
+      <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
         <h2>모임</h2>
         <div
           style={{
@@ -94,12 +75,10 @@ function MainPage() {
           {token && <UserInfo onAddressCheck={handleAddressCheck} />}
           {isLoggedIn && <CreateButton />}
         </div>
-
         <MapSection onMapLoaded={handleMapLoaded} />
       </div>
     </div>
   );
-
 }
 
 export default MainPage;
