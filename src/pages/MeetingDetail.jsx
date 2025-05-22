@@ -61,7 +61,13 @@ function MeetingDetail() {
         try {
           // 참가자 목록 가져오기
           const enrolledResponse = await fetch(
-            `${BACKEND_API_URL}/enroll/enrolled-list/${id}`
+            `${BACKEND_API_URL}/enroll/enrolled-list/${id}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
 
           if (enrolledResponse.ok) {
