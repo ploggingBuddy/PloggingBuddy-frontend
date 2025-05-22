@@ -4,53 +4,8 @@ const MapModal = ({ onClose, onSelect }) => {
   const [userPosition, setUserPosition] = useState(null);
 
   useEffect(() => {
-    const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
-
-    const loadScript = () =>
-      new Promise((resolve) => {
-        if (document.querySelector('script[src*="dapi.kakao.com"]')) {
-          resolve();
-        } else {
-          const script = document.createElement("script");
-          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
-          script.async = true;
-          script.onload = resolve;
-          document.head.appendChild(script);
-        }
-      });
-
-    const waitForKakaoReady = () =>
-      new Promise((resolve) => {
-        const check = () => {
-          if (
-            window.kakao &&
-            window.kakao.maps &&
-            window.kakao.maps.services &&
-            window.kakao.maps.services.Geocoder
-          ) {
-            resolve();
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-
-    const waitForMapDiv = () =>
-      new Promise((resolve) => {
-        const check = () => {
-          const el = document.getElementById("map");
-          if (el && el.offsetWidth > 0 && el.offsetHeight > 0) {
-            resolve(el);
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-
-    const init = async () => {
-      // ✅ 먼저 현재 위치 요청
+    // ✅ 사용자 위치 요청
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setUserPosition({
@@ -59,40 +14,33 @@ const MapModal = ({ onClose, onSelect }) => {
           });
         },
         (err) => {
-          console.warn("GPS 위치 불러오기 실패:", err);
+          console.warn("📍 위치 정보 허용 안 됨, 기본 위치 사용");
           setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 기본값
         }
       );
-    };
-
-    init();
+    }
   }, []);
 
   useEffect(() => {
     if (!userPosition) return;
 
-    const initMapScriptAndDraw = async () => {
-      await new Promise((resolve) => {
-        const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
+    const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-        if (document.querySelector('script[src*="dapi.kakao.com"]')) {
-          resolve();
-        } else {
-          const script = document.createElement("script");
-          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
-          script.async = true;
-          script.onload = resolve;
-          document.head.appendChild(script);
-        }
-      });
+    const loadScriptAndMap = async () => {
+      if (!document.querySelector('script[src*="dapi.kakao.com"]')) {
+        const script = document.createElement("script");
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+        script.async = true;
+        document.head.appendChild(script);
+        await new Promise((resolve) => (script.onload = resolve));
+      }
 
       await new Promise((resolve) => {
         const check = () => {
           if (
             window.kakao &&
             window.kakao.maps &&
-            window.kakao.maps.services &&
-            window.kakao.maps.services.Geocoder
+            window.kakao.maps.services
           ) {
             resolve();
           } else {
@@ -102,64 +50,51 @@ const MapModal = ({ onClose, onSelect }) => {
         check();
       });
 
-      await new Promise((resolve) => {
-        const check = () => {
-          const el = document.getElementById("map");
-          if (el && el.offsetWidth > 0 && el.offsetHeight > 0) {
-            resolve(el);
-          } else {
-            setTimeout(check, 50);
-          }
-        };
-        check();
-      });
-
       window.kakao.maps.load(() => {
-        initMap();
+        const container = document.getElementById("map");
+        if (!container) return;
+
+        const mapOption = {
+          center: new window.kakao.maps.LatLng(
+            userPosition.lat,
+            userPosition.lng
+          ),
+          level: 3,
+        };
+
+        const map = new window.kakao.maps.Map(container, mapOption);
+        const geocoder = new window.kakao.maps.services.Geocoder();
+
+        window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
+          const lat = mouseEvent.latLng.getLat();
+          const lng = mouseEvent.latLng.getLng();
+
+          geocoder.coord2Address(lng, lat, (result, status) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const address = result[0].address.address_name;
+              console.log("📍 선택된 주소:", address);
+
+              onSelect({
+                latlng: { lat, lng },
+                addressText: address,
+              });
+
+              onClose();
+            } else {
+              alert("주소를 불러올 수 없습니다.");
+            }
+          });
+        });
       });
     };
 
-    initMapScriptAndDraw();
+    loadScriptAndMap();
 
     return () => {
-      const mapContainer = document.getElementById("map");
-      if (mapContainer) mapContainer.innerHTML = "";
+      const container = document.getElementById("map");
+      if (container) container.innerHTML = "";
     };
   }, [userPosition]);
-
-  const initMap = () => {
-    const container = document.getElementById("map");
-    if (!container || !userPosition) return;
-
-    const options = {
-      center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
-      level: 3,
-    };
-
-    const map = new window.kakao.maps.Map(container, options);
-    const geocoder = new window.kakao.maps.services.Geocoder();
-
-    window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
-      const lat = mouseEvent.latLng.getLat();
-      const lng = mouseEvent.latLng.getLng();
-
-      geocoder.coord2Address(lng, lat, (result, status) => {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const address = result[0].address.address_name;
-          console.log("📍 선택된 주소:", address);
-
-          onSelect({
-            latlng: { lat, lng },
-            addressText: address,
-          });
-
-          onClose();
-        } else {
-          alert("주소를 불러올 수 없습니다.");
-        }
-      });
-    });
-  };
 
   return (
     <div
