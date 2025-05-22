@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const MapModal = ({ onClose, onSelect }) => {
-  
+  const [userPosition, setUserPosition] = useState(null);
+
   useEffect(() => {
-    
     const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
 
     const loadScript = () =>
@@ -50,28 +50,89 @@ const MapModal = ({ onClose, onSelect }) => {
       });
 
     const init = async () => {
-      await loadScript();
-      window.kakao.maps.load(async () => {
-        await waitForKakaoReady();
-        await waitForMapDiv(); // ✅ map div도 실제 화면에 렌더링된 후 실행
+      // ✅ 먼저 현재 위치 요청
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserPosition({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        (err) => {
+          console.warn("GPS 위치 불러오기 실패:", err);
+          setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 기본값
+        }
+      );
+    };
+
+    init();
+  }, []);
+
+  useEffect(() => {
+    if (!userPosition) return;
+
+    const initMapScriptAndDraw = async () => {
+      await new Promise((resolve) => {
+        const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
+
+        if (document.querySelector('script[src*="dapi.kakao.com"]')) {
+          resolve();
+        } else {
+          const script = document.createElement("script");
+          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+          script.async = true;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        }
+      });
+
+      await new Promise((resolve) => {
+        const check = () => {
+          if (
+            window.kakao &&
+            window.kakao.maps &&
+            window.kakao.maps.services &&
+            window.kakao.maps.services.Geocoder
+          ) {
+            resolve();
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+
+      await new Promise((resolve) => {
+        const check = () => {
+          const el = document.getElementById("map");
+          if (el && el.offsetWidth > 0 && el.offsetHeight > 0) {
+            resolve(el);
+          } else {
+            setTimeout(check, 50);
+          }
+        };
+        check();
+      });
+
+      window.kakao.maps.load(() => {
         initMap();
       });
     };
 
-    init();
+    initMapScriptAndDraw();
 
     return () => {
       const mapContainer = document.getElementById("map");
       if (mapContainer) mapContainer.innerHTML = "";
     };
-  }, []);
+  }, [userPosition]);
 
   const initMap = () => {
     const container = document.getElementById("map");
-    if (!container) return;
+    if (!container || !userPosition) return;
 
     const options = {
-      center: new window.kakao.maps.LatLng(37.5665, 126.978),
+      center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
       level: 3,
     };
 
