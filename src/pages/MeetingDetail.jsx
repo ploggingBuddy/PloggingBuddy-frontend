@@ -150,44 +150,6 @@ function MeetingDetail() {
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
         setMeeting(updatedData);
-
-        // 참가자 수가 최대 인원에 도달했는지 확인
-        if (updatedData.enrolledCount === updatedData.participantMaxNumber) {
-          // 조기마감 API 호출
-          const finishResponse = await fetch(
-            `${BACKEND_API_URL}/gathering/gathering-finish/${id}`,
-            {
-              method: "PUT",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (!finishResponse.ok) {
-            throw new Error("모임 마감 처리에 실패했습니다.");
-          }
-
-          // 마감 처리 후 다시 한번 모임 정보 새로고침
-          const finalResponse = await fetch(
-            `${BACKEND_API_URL}/gathering/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (finalResponse.ok) {
-            const finalData = await finalResponse.json();
-            setMeeting(finalData);
-            alert("모임 참가 신청이 완료되었습니다! 모임이 마감되었습니다.");
-          }
-        } else {
-          alert("모임 참가 신청이 완료되었습니다!");
-        }
-        navigate("/mypage");
       }
     } catch (err) {
       alert(err.message);
@@ -303,29 +265,32 @@ function MeetingDetail() {
             </div>
 
             {/* 모임 생성자인 경우에만 인원 변경 버튼 표시 */}
-            {isCreator && (
-              <div className="info-item">
-                <div className="max-participants-control">
-                  <input
-                    type="range"
-                    min={meeting.currentParticipants ?? 1}
-                    max={10}
-                    value={maxParticipants}
-                    onChange={(e) => setMaxParticipants(Number(e.target.value))}
-                    className="max-participants-range"
-                  />
-                  <span className="max-participants-value sb-14">
-                    {maxParticipants}명
-                  </span>
-                  <button
-                    className="change-max-btn"
-                    onClick={handleChangeMaxParticipants}
-                  >
-                    <span className="sb-14">인원 변경</span>
-                  </button>
+            {isCreator &&
+              !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
+                <div className="info-item">
+                  <div className="max-participants-control">
+                    <input
+                      type="range"
+                      min={meeting.currentParticipants ?? 1}
+                      max={10}
+                      value={maxParticipants}
+                      onChange={(e) =>
+                        setMaxParticipants(Number(e.target.value))
+                      }
+                      className="max-participants-range"
+                    />
+                    <span className="max-participants-value sb-14">
+                      {maxParticipants}명
+                    </span>
+                    <button
+                      className="change-max-btn"
+                      onClick={handleChangeMaxParticipants}
+                    >
+                      <span className="sb-14">인원 변경</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             <div className="info-item">
               <span className="label rg-14">모집 기간</span>
@@ -357,7 +322,7 @@ function MeetingDetail() {
               <span className="sb-14">신청하기</span>
             </button>
           )}
-          {isCreator && (
+          {isCreator && !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
             <div>
               <button
                 className="delete-meeting-btn"
