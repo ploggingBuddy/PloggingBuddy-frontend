@@ -10,26 +10,30 @@ function MainPage() {
   const token = localStorage.getItem("kakao_token");
 
   const [showAddressPrompt, setShowAddressPrompt] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingMap, setLoadingMap] = useState(true);
+
+  const isLoading = isLoggedIn && (loadingUser || loadingMap);
 
   const handleAddressCheck = (hasAddress) => {
     if (!hasAddress) {
       setShowAddressPrompt(true);
     }
-    setLoading(false); // 사용자 정보 확인 완료 시 로딩 종료
+    setLoadingUser(false); // ✅ 사용자 정보 로딩 완료
   };
 
   const handleMapLoaded = () => {
-    setLoading(false); // 지도까지 로딩 완료 시 로딩 종료
+    setLoadingMap(false); // ✅ 지도 로딩 완료
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      setLoading(true); // 로그인된 이후에만 로딩 시작
+    if (!isLoggedIn) {
+      setLoadingUser(false); // 로그인 안 되어 있으면 로딩 안 함
+      setLoadingMap(false);
     }
   }, [isLoggedIn]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="meeting-detail-wrapper">
         <div className="meeting-detail-container">
