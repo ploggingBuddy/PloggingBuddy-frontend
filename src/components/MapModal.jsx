@@ -2,31 +2,31 @@ import React, { useEffect, useState } from "react";
 
 const MapModal = ({ onClose, onSelect }) => {
   const [userPosition, setUserPosition] = useState(null);
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
+  const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
+
+  // ✅ 사용자 GPS 위치 요청
   useEffect(() => {
-    // ✅ 사용자 위치 요청
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserPosition({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          });
-        },
-        (err) => {
-          console.warn("📍 위치 정보 허용 안 됨, 기본 위치 사용");
-          setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 기본값
-        }
-      );
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserPosition({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        console.warn("위치 권한 거부됨, 기본 위치 사용");
+        setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 시청
+      }
+    );
   }, []);
 
+  // ✅ 지도 스크립트 로딩 및 지도 렌더링 (위치 정보가 있어야 실행)
   useEffect(() => {
-    if (!userPosition) return;
+    if (!userPosition || isMapInitialized) return;
 
-    const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
-
-    const loadScriptAndMap = async () => {
+    const loadMap = async () => {
       if (!document.querySelector('script[src*="dapi.kakao.com"]')) {
         const script = document.createElement("script");
         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
@@ -85,16 +85,18 @@ const MapModal = ({ onClose, onSelect }) => {
             }
           });
         });
+
+        setIsMapInitialized(true);
       });
     };
 
-    loadScriptAndMap();
+    loadMap();
 
     return () => {
       const container = document.getElementById("map");
       if (container) container.innerHTML = "";
     };
-  }, [userPosition]);
+  }, [userPosition, isMapInitialized]);
 
   return (
     <div
