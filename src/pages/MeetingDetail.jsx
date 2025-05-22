@@ -297,7 +297,7 @@ function MeetingDetail() {
           {/* 모임 생성자가 아니고, 아직 신청하지 않은 경우에만 참여하기 버튼 표시 */}
           {!isCreator &&
             !isEnrolled &&
-            !meeting.gatheringStatus === "GATHERING_CONFIRMED" && (
+            meeting.gatheringStatus === "GATHERING" && (
               <button className="join-meeting-btn" onClick={handleJoinMeeting}>
                 <span className="sb-14">신청하기</span>
               </button>
