@@ -25,7 +25,11 @@ function MeetingCard({
       <div className="card-title sb-16">{gatheringName}</div>
       <div className="card-content">
         <div className={`meeting-status ${statusClass} rg-12`}>
-          {postStatus === "GATHERING_CONFIRMED" ? "모집 완료" : "모집 중"}
+          {postStatus === "GATHERING_CONFIRMED"
+            ? "모집 완료"
+            : meeting.gatheringStatus === "GATHERING_PENDING"
+            ? "모집 마감 보류"
+            : "모집 중"}
         </div>
         {/* <span className="rg-14">생성자: {leadUserNickname}</span> */}
         <span className="rg-14">
