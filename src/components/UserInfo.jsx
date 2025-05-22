@@ -2,45 +2,54 @@ import React, { useEffect, useState } from 'react';
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
-function UserInfo() {
+function UserInfo({ onAddressCheck }) {
   const [user, setUser] = useState({ name: '', profileImage: '' });
 
   useEffect(() => {
-  const token = localStorage.getItem("kakao_token");
-  console.log("UserInfo token:", token); // ✅ 확인
-
-  if (!token) {
-    console.warn("UserInfo: 토큰 없음");
-    return;
-  }
-
-  const fetchUserInfo = async () => {
-    try {
-      console.log("요청 시작:", `${BACKEND_API_URL}/member/me`);
-      const res = await fetch(`${BACKEND_API_URL}/member/me`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("사용자 정보 요청 실패");
-
-      const data = await res.json();
-      console.log("받은 데이터:", data);
-
-      setUser({
-        name: data.nickname || "알 수 없음",
-        profileImage: data.profileImageUrl || "",
-      });
-    } catch (err) {
-      console.error("UserInfo에서 사용자 정보 가져오기 실패:", err);
+    const token = localStorage.getItem("kakao_token");
+    if (!token) {
+      console.warn("UserInfo: 토큰 없음");
+      return;
     }
-  };
 
-  fetchUserInfo();
-}, []);
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("사용자 정보 요청 실패");
 
+        const data = await res.json();
+        setUser({
+          name: data.nickname || "알 수 없음",
+          profileImage: data.profileImageUrl || "",
+        });
+      } catch (err) {
+        console.error("사용자 정보 가져오기 실패:", err);
+      }
+    };
+
+    const checkAddress = async () => {
+      try {
+        const res = await fetch(`${BACKEND_API_URL}/member/address/validate`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("주소 유효성 확인 실패");
+
+        const data = await res.json();
+        if (!data.hasAddress && onAddressCheck) {
+          onAddressCheck(false); // 주소 없음
+        }
+      } catch (err) {
+        console.error("주소 유효성 검사 실패:", err);
+      }
+    };
+
+    fetchUserInfo();
+    checkAddress();
+  }, []);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
