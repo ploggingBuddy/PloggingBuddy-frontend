@@ -14,7 +14,7 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ 1. 사용자 주소 기반 위치 설정
+  // ✅ 사용자 주소 기반 좌표 설정
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -27,34 +27,30 @@ function MapSection() {
         const address = data.detailAddress;
 
         if (address && address.trim() !== "") {
-          // Kakao Geocoder 로딩
-          const script = document.createElement("script");
-          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
-          script.async = true;
-          document.head.appendChild(script);
-
-          script.onload = () => {
-            window.kakao.maps.load(() => {
+          loadKakaoMapSDK(() => {
+            waitForGeocoder(() => {
               const geocoder = new window.kakao.maps.services.Geocoder();
               geocoder.addressSearch(address, (result, status) => {
-                if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
+                if (
+                  status === window.kakao.maps.services.Status.OK &&
+                  result.length > 0
+                ) {
                   setUserPosition({
                     lat: parseFloat(result[0].y),
                     lng: parseFloat(result[0].x),
                   });
                 } else {
-                  console.warn("주소 → 좌표 변환 실패, GPS fallback");
+                  console.warn("주소 → 좌표 변환 실패");
                   fallbackToGPS();
                 }
               });
             });
-          };
+          });
         } else {
-          console.warn("detailAddress 없음, GPS fallback");
           fallbackToGPS();
         }
-      } catch (e) {
-        console.warn("사용자 정보 요청 실패:", e);
+      } catch (err) {
+        console.warn("사용자 정보 불러오기 실패");
         fallbackToGPS();
       }
     };
@@ -77,16 +73,45 @@ function MapSection() {
       }
     };
 
+    const loadKakaoMapSDK = (onLoad) => {
+      if (!document.querySelector('script[src*="dapi.kakao.com"]')) {
+        const script = document.createElement("script");
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+        script.async = true;
+        script.onload = () => {
+          window.kakao.maps.load(onLoad);
+        };
+        document.head.appendChild(script);
+      } else {
+        window.kakao.maps.load(onLoad);
+      }
+    };
+
+    const waitForGeocoder = (callback) => {
+      const check = () => {
+        if (
+          window.kakao &&
+          window.kakao.maps &&
+          window.kakao.maps.services &&
+          window.kakao.maps.services.Geocoder
+        ) {
+          callback();
+        } else {
+          setTimeout(check, 50);
+        }
+      };
+      check();
+    };
+
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 2. 모집 글 불러오기
+  // ✅ 모집 글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
-
       try {
-        const response = await fetch(
+        const res = await fetch(
           `${BACKEND_API_URL}/gathering/spot/${lat}/${lng}`,
           {
             headers: {
@@ -94,111 +119,125 @@ function MapSection() {
             },
           }
         );
-        const data = await response.json();
+        const data = await res.json();
         setMeetups(data.gatheringPreviewList || []);
-      } catch (error) {
-        console.error("모임 데이터 요청 실패:", error);
+      } catch (err) {
+        console.error("모임 데이터 요청 실패:", err);
       }
     };
 
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 3. 지도 생성 및 마커/오버레이
+  // ✅ 지도 + 마커 + 오버레이 표시
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
-    script.async = true;
-    document.head.appendChild(script);
+    const loadMap = () => {
+      const container = document.getElementById("map");
+      const options = {
+        center: new window.kakao.maps.LatLng(
+          userPosition.lat,
+          userPosition.lng
+        ),
+        level: 5,
+      };
 
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        const container = document.getElementById("map");
-        const options = {
-          center: new window.kakao.maps.LatLng(userPosition.lat, userPosition.lng),
-          level: 5,
-        };
+      const map = new window.kakao.maps.Map(container, options);
 
-        const map = new window.kakao.maps.Map(container, options);
+      const markerImage = new window.kakao.maps.MarkerImage(
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+        new window.kakao.maps.Size(25, 41),
+        { offset: new window.kakao.maps.Point(12, 41) }
+      );
 
-        const markerImage = new window.kakao.maps.MarkerImage(
-          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-          new window.kakao.maps.Size(25, 41),
-          { offset: new window.kakao.maps.Point(12, 41) }
-        );
+      let currentOverlay = null;
 
-        let currentOverlay = null;
+      meetups.forEach((item) => {
+        const marker = new window.kakao.maps.Marker({
+          map,
+          position: new window.kakao.maps.LatLng(
+            item.latitude,
+            item.longitude
+          ),
+          image: markerImage,
+        });
 
-        meetups.forEach((item) => {
-          const marker = new window.kakao.maps.Marker({
-            map,
-            position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
-            image: markerImage,
-          });
+        window.kakao.maps.event.addListener(marker, "click", async () => {
+          if (currentOverlay) currentOverlay.setMap(null);
 
-          window.kakao.maps.event.addListener(marker, "click", async () => {
-            if (currentOverlay) currentOverlay.setMap(null);
-
-            try {
-              const res = await fetch(`${BACKEND_API_URL}/gathering/${item.gatheringPostId}`, {
+          try {
+            const res = await fetch(
+              `${BACKEND_API_URL}/gathering/${item.gatheringPostId}`,
+              {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
-              });
-              const detail = await res.json();
+              }
+            );
+            const detail = await res.json();
 
-              const endDate = new Date(detail.gatheringEndTime);
-              const endMonth = endDate.getMonth() + 1;
-              const endDay = endDate.getDate();
+            const endDate = new Date(detail.gatheringEndTime);
+            const endMonth = endDate.getMonth() + 1;
+            const endDay = endDate.getDate();
 
-              const contentDiv = document.createElement("div");
-              contentDiv.innerHTML = `
-                <div style="width: 260px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: sans-serif;">
-                  <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;">
-                    ${detail.title}
-                  </div>
-                  <span style="display: inline-block; background: #e0f2ff; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
-                    모집 중
-                  </span>
-                  <div style="font-size: 14px; margin-bottom: 4px;">최대 인원: ${detail.participantMaxNumber}명</div>
-                  <div style="font-size: 14px; margin-bottom: 4px;">모집 마감일: ${endMonth}/${endDay}</div>
-                  <div style="font-size: 14px; margin-bottom: 12px;">📍 ${detail.address}</div>
-                  <button id="btn-${item.gatheringPostId}" style="width: 100%; padding: 10px 0; background: #dcedc8; color: #33691e; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                    상세 정보 보기
-                  </button>
+            const contentDiv = document.createElement("div");
+            contentDiv.innerHTML = `
+              <div style="width: 260px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-family: sans-serif;">
+                <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;">
+                  ${detail.title}
                 </div>
-              `;
+                <span style="display: inline-block; background: #e0f2ff; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
+                  모집 중
+                </span>
+                <div style="font-size: 14px; margin-bottom: 4px;">최대 인원: ${detail.participantMaxNumber}명</div>
+                <div style="font-size: 14px; margin-bottom: 4px;">모집 마감일: ${endMonth}/${endDay}</div>
+                <div style="font-size: 14px; margin-bottom: 12px;">📍 ${detail.address}</div>
+                <button id="btn-${item.gatheringPostId}" style="width: 100%; padding: 10px 0; background: #dcedc8; color: #33691e; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                  상세 정보 보기
+                </button>
+              </div>
+            `;
 
-              const overlay = new window.kakao.maps.CustomOverlay({
-                content: contentDiv,
-                position: marker.getPosition(),
-                yAnchor: 1.4,
-              });
+            const overlay = new window.kakao.maps.CustomOverlay({
+              content: contentDiv,
+              position: marker.getPosition(),
+              yAnchor: 1.4,
+            });
 
-              overlay.setMap(map);
-              currentOverlay = overlay;
+            overlay.setMap(map);
+            currentOverlay = overlay;
 
-              setTimeout(() => {
-                const btn = document.getElementById(`btn-${item.gatheringPostId}`);
-                if (btn) {
-                  btn.onclick = () => {
-                    navigate(`/meeting/${item.gatheringPostId}`);
-                  };
-                }
-              }, 0);
-            } catch (err) {
-              console.error("상세 정보 요청 실패:", err);
-            }
-          });
+            setTimeout(() => {
+              const btn = document.getElementById(
+                `btn-${item.gatheringPostId}`
+              );
+              if (btn) {
+                btn.onclick = () => {
+                  navigate(`/meeting/${item.gatheringPostId}`);
+                };
+              }
+            }, 0);
+          } catch (err) {
+            console.error("상세 정보 요청 실패:", err);
+          }
         });
       });
     };
 
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
+    script.async = true;
+    script.onload = () => {
+      window.kakao.maps.load(loadMap);
+    };
+    document.head.appendChild(script);
+
     return () => {
-      const existing = document.querySelector('script[src*="dapi.kakao.com"]');
+      const existing = document.querySelector(
+        'script[src*="dapi.kakao.com"]'
+      );
       if (existing) document.head.removeChild(existing);
     };
-  }, [meetups, navigate, token, userPosition]);
+  }, [meetups, userPosition]);
 
   return (
     <div
