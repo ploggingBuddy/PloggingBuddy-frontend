@@ -113,6 +113,8 @@ function MapSection() {
     };
 
     const waitForGeocoder = (callback) => {
+      let attempts = 0;
+
       const check = () => {
         if (
           window.kakao &&
@@ -120,11 +122,18 @@ function MapSection() {
           window.kakao.maps.services &&
           window.kakao.maps.services.Geocoder
         ) {
+          console.log("✅ Geocoder 준비 완료");
           callback();
         } else {
-          setTimeout(check, 50);
+          attempts++;
+          if (attempts > 50) {
+            console.error("❌ Geocoder 로딩 실패 (timeout)");
+            return;
+          }
+          setTimeout(check, 100);
         }
       };
+
       check();
     };
 
