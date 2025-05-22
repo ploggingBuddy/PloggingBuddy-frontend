@@ -11,26 +11,73 @@ function MapSection() {
   const [meetups, setMeetups] = useState([]);
   const [userPosition, setUserPosition] = useState({
     lat: 37.5665,
-    lng: 126.978, // 기본 위치: 서울 시청
+    lng: 126.978, // 기본: 서울 시청
   });
 
-  // ✅ 1. 사용자 위치 확인 (최초 1회만 실행)
+  // ✅ 1. 주소 → 위도/경도 변환 or GPS fallback
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          setUserPosition({ lat, lng });
-        },
-        (err) => {
-          console.warn("GPS 허용 안됨, 기본 위치 사용");
-        }
-      );
-    }
-  }, []);
+    const fetchUserAddress = async () => {
+      try {
+        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        const address = data.address;
 
-  // ✅ 2. 위치 기반 모집 글 불러오기
+        if (address) {
+          // 주소 → 좌표 변환
+          const geocoderScript = document.createElement("script");
+          geocoderScript.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&libraries=services&autoload=false`;
+          geocoderScript.async = true;
+          document.head.appendChild(geocoderScript);
+
+          geocoderScript.onload = () => {
+            window.kakao.maps.load(() => {
+              const geocoder = new window.kakao.maps.services.Geocoder();
+              geocoder.addressSearch(address, (result, status) => {
+                if (status === window.kakao.maps.services.Status.OK) {
+                  setUserPosition({
+                    lat: parseFloat(result[0].y),
+                    lng: parseFloat(result[0].x),
+                  });
+                } else {
+                  console.warn("주소 변환 실패, GPS 시도");
+                  fallbackToGPS();
+                }
+              });
+            });
+          };
+        } else {
+          fallbackToGPS();
+        }
+      } catch (e) {
+        console.warn("주소 불러오기 실패, GPS 시도");
+        fallbackToGPS();
+      }
+    };
+
+    const fallbackToGPS = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserPosition({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          },
+          () => {
+            console.warn("GPS 실패 → 기본 위치 사용");
+          }
+        );
+      }
+    };
+
+    fetchUserAddress();
+  }, [token]);
+
+  // ✅ 2. 모집 글 로드
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
@@ -54,7 +101,7 @@ function MapSection() {
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 3. 지도 로딩 및 마커 + 오버레이 구성
+  // ✅ 3. 지도 + 마커 + 오버레이 표시
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
@@ -107,15 +154,12 @@ function MapSection() {
                   <div style="font-weight: bold; font-size: 15px; margin-bottom: 8px; line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;">
                     ${detail.title}
                   </div>
-
                   <span style="display: inline-block; background: #e0f2ff; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
                     모집 중
                   </span>
-
                   <div style="font-size: 14px; margin-bottom: 4px;">최대 인원: ${detail.participantMaxNumber}명</div>
                   <div style="font-size: 14px; margin-bottom: 4px;">모집 마감일: ${endMonth}/${endDay}</div>
                   <div style="font-size: 14px; margin-bottom: 12px;">📍 ${detail.address}</div>
-
                   <button id="btn-${item.gatheringPostId}" style="width: 100%; padding: 10px 0; background: #dcedc8; color: #33691e; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
                     상세 정보 보기
                   </button>
