@@ -58,33 +58,37 @@ function MeetingDetail() {
             : ""
         );
 
-        // 참가자 목록 가져오기
-        const enrolledResponse = await fetch(
-          `${BACKEND_API_URL}/enroll/enrolled-list/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        try {
+          // 참가자 목록 가져오기
+          const enrolledResponse = await fetch(
+            `${BACKEND_API_URL}/enroll/enrolled-list/${id}`
+          );
 
-        if (enrolledResponse.ok) {
-          const enrolledData = await enrolledResponse.json();
-          // 현재 사용자의 ID 가져오기
-          const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          if (enrolledResponse.ok) {
+            const enrolledData = await enrolledResponse.json();
+            // 현재 사용자의 정보 가져오기
+            const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
 
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            // 참가자 목록에서 현재 사용자가 있는지 확인
-            const isUserEnrolled = enrolledData.enrollmentDataDataList.some(
-              (enrollment) => enrollment.name === userData.nickname
-            );
-            setIsEnrolled(isUserEnrolled);
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              // 참가자 목록에서 현재 사용자가 있는지 확인
+              const isUserEnrolled = enrolledData.enrollmentDataDataList.some(
+                (enrollment) => enrollment.name === userData.nickname
+              );
+              setIsEnrolled(isUserEnrolled);
+            }
           }
+        } catch (enrolledError) {
+          console.error(
+            "참가자 목록을 가져오는데 실패했습니다:",
+            enrolledError
+          );
+          // 참가자 목록 조회 실패 시 기본값으로 설정
+          setIsEnrolled(false);
         }
       } catch (err) {
         setError(err.message);
