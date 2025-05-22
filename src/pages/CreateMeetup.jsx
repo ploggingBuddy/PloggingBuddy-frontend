@@ -38,9 +38,6 @@ const CreateMeetup = () => {
     }
   }, []);
 
-
-
-
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
   const token = localStorage.getItem("kakao_token");
 
@@ -162,6 +159,7 @@ const CreateMeetup = () => {
       }
 
       alert("✅ 모임이 성공적으로 생성되었습니다!");
+      navigate("/");
     } catch (error) {
       console.error("❌ 모임 생성 중 오류:", error);
       alert("모임 생성 실패. 콘솔을 확인해주세요.");
