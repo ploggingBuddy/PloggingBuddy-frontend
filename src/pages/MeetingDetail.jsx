@@ -3,16 +3,17 @@ import { useEffect, useState } from "react";
 import "../css/meetingDetail.css";
 import Loading from "../components/Loading";
 import { formatDate, formatAddress, formatDateTime } from "../utils/format";
+
 function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentParticipants, setCurrentParticipants] = useState(0);
   const [isCreator, setIsCreator] = useState(false);
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [statusClass, setStatusClass] = useState("");
+  const [isEnrolled, setIsEnrolled] = useState(false);
   const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
   useEffect(() => {
@@ -26,6 +27,7 @@ function MeetingDetail() {
 
       setLoading(true);
       try {
+        // 모임 상세 정보 가져오기
         const response = await fetch(`${BACKEND_API_URL}/gathering/${id}`, {
           method: "GET",
           headers: {
@@ -56,6 +58,35 @@ function MeetingDetail() {
             ? "hold"
             : ""
         );
+
+        // 참가자 목록 가져오기
+        const enrolledResponse = await fetch(
+          `${BACKEND_API_URL}/enroll/enrolled-list/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (enrolledResponse.ok) {
+          const enrolledData = await enrolledResponse.json();
+          // 현재 사용자의 ID 가져오기
+          const userResponse = await fetch(`${BACKEND_API_URL}/member/me`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            // 참가자 목록에서 현재 사용자가 있는지 확인
+            const isUserEnrolled = enrolledData.enrollmentDataDataList.some(
+              (enrollment) => enrollment.name === userData.nickname
+            );
+            setIsEnrolled(isUserEnrolled);
+          }
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -222,7 +253,7 @@ function MeetingDetail() {
             <div className="info-item">
               <span className="label rg-14">참여 인원</span>
               <span className="value sb-14">
-                {meeting.participantMaxNumber}명
+                {meeting.enrolledCount}/ {meeting.participantMaxNumber}명
               </span>
             </div>
 
@@ -275,16 +306,9 @@ function MeetingDetail() {
               {meeting.content || "모임 설명이 없습니다."}
             </p>
           </div>
-          {/* 모임 생성자가 아닌 경우에만 참여하기 버튼 표시 */}
-          {!isCreator && (
-            <button
-              className="join-meeting-btn"
-              // disabled={
-              //   meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
-              //   meeting.gatheringStatus === "GATHERING_PENDING"
-              // }
-              onClick={handleJoinMeeting}
-            >
+          {/* 모임 생성자가 아니고, 아직 신청하지 않은 경우에만 참여하기 버튼 표시 */}
+          {!isCreator && !isEnrolled && (
+            <button className="join-meeting-btn" onClick={handleJoinMeeting}>
               <span className="sb-14">신청하기</span>
             </button>
           )}
@@ -292,10 +316,6 @@ function MeetingDetail() {
             <div>
               <button
                 className="delete-meeting-btn"
-                // disabled={
-                //   meeting.gatheringStatus === "GATHERING_CONFIRMED" ||
-                //   meeting.gatheringStatus === "GATHERING"
-                // }
                 onClick={handleDeleteMeeting}
               >
                 <span className="sb-14">모임 취소</span>
