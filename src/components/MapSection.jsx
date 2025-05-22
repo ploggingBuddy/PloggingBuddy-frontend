@@ -14,7 +14,7 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ 1. 주소 → 좌표 변환 흐름
+  // ✅ 1. 사용자 주소 기반 좌표 설정
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -30,39 +30,30 @@ function MapSection() {
         if (rawAddress && rawAddress.trim() !== "") {
           const simplifiedAddress = rawAddress.split(" ").slice(0, 3).join(" ");
           console.log("🔍 검색용 주소:", simplifiedAddress);
-
           loadKakaoMapSDK(() => {
-            waitForGeocoder(() => {
-              try {
-                const geocoder = new window.kakao.maps.services.Geocoder();
-                if (!geocoder) {
-                  console.error("❌ Geocoder 생성 실패");
+            try {
+              const geocoder = new window.kakao.maps.services.Geocoder();
+              console.log("✅ Geocoder 생성됨");
+
+              geocoder.addressSearch(simplifiedAddress, (result, status) => {
+                console.log("🧭 지오코딩 결과:", result, "상태:", status);
+                if (
+                  status === window.kakao.maps.services.Status.OK &&
+                  result.length > 0
+                ) {
+                  const lat = parseFloat(result[0].y);
+                  const lng = parseFloat(result[0].x);
+                  console.log("📌 좌표 설정:", { lat, lng });
+                  setUserPosition({ lat, lng });
+                } else {
+                  console.warn("❌ 주소 변환 실패 → fallback to GPS");
                   fallbackToGPS();
-                  return;
                 }
-
-                geocoder.addressSearch(simplifiedAddress, (result, status) => {
-                  console.log("🧭 지오코딩 결과:", result, "상태:", status);
-
-                  if (
-                    status === window.kakao.maps.services.Status.OK &&
-                    result.length > 0
-                  ) {
-                    const lat = parseFloat(result[0].y);
-                    const lng = parseFloat(result[0].x);
-                    console.log("📌 좌표 설정:", { lat, lng });
-                    setUserPosition({ lat, lng });
-                  } else {
-                    console.warn("❌ 주소 변환 실패 → fallback to GPS");
-                    console.warn("🔍 실패 원인 result:", result, "status:", status);
-                    fallbackToGPS();
-                  }
-                });
-              } catch (error) {
-                console.error("🔴 지오코딩 중 예외 발생:", error);
-                fallbackToGPS();
-              }
-            });
+              });
+            } catch (error) {
+              console.error("🔴 지오코딩 중 예외 발생:", error);
+              fallbackToGPS();
+            }
           });
         } else {
           console.warn("⚠️ detailAddress 없음 → fallback to GPS");
@@ -96,51 +87,32 @@ function MapSection() {
       }
     };
 
-    const loadKakaoMapSDK = (onLoad) => {
+    const loadKakaoMapSDK = (onGeocoderReady) => {
       if (!document.querySelector('script[src*="dapi.kakao.com"]')) {
         const script = document.createElement("script");
         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
         script.async = true;
         script.onload = () => {
           console.log("✅ Kakao SDK 로드 완료");
-          window.kakao.maps.load(onLoad);
+          window.kakao.maps.load(() => {
+            console.log("✅ Kakao.maps.load 완료");
+            onGeocoderReady();
+          });
         };
         document.head.appendChild(script);
       } else {
         console.log("🟡 Kakao SDK 이미 로드됨");
-        window.kakao.maps.load(onLoad);
+        window.kakao.maps.load(() => {
+          console.log("✅ Kakao.maps.load 완료 (재로드)");
+          onGeocoderReady();
+        });
       }
-    };
-
-    const waitForGeocoder = (callback) => {
-      let attempts = 0;
-
-      const check = () => {
-        if (
-          window.kakao &&
-          window.kakao.maps &&
-          window.kakao.maps.services &&
-          window.kakao.maps.services.Geocoder
-        ) {
-          console.log("✅ Geocoder 준비 완료");
-          callback();
-        } else {
-          attempts++;
-          if (attempts > 50) {
-            console.error("❌ Geocoder 로딩 실패 (timeout)");
-            return;
-          }
-          setTimeout(check, 100);
-        }
-      };
-
-      check();
     };
 
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 2. 모집 글 로드
+  // ✅ 2. 모집 글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
