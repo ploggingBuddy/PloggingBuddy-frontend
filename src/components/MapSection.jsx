@@ -11,10 +11,10 @@ function MapSection() {
   const [meetups, setMeetups] = useState([]);
   const [userPosition, setUserPosition] = useState({
     lat: 37.5665,
-    lng: 126.978, // 기본: 서울 시청
+    lng: 126.978,
   });
 
-  // ✅ 1. 주소 → 위도/경도 변환 or GPS fallback
+  // ✅ 1. 사용자 주소 기반 위치 설정
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
@@ -24,36 +24,37 @@ function MapSection() {
           },
         });
         const data = await res.json();
-        const address = data.address;
+        const address = data.detailAddress;
 
-        if (address) {
-          // 주소 → 좌표 변환
-          const geocoderScript = document.createElement("script");
-          geocoderScript.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&libraries=services&autoload=false`;
-          geocoderScript.async = true;
-          document.head.appendChild(geocoderScript);
+        if (address && address.trim() !== "") {
+          // Kakao Geocoder 로딩
+          const script = document.createElement("script");
+          script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+          script.async = true;
+          document.head.appendChild(script);
 
-          geocoderScript.onload = () => {
+          script.onload = () => {
             window.kakao.maps.load(() => {
               const geocoder = new window.kakao.maps.services.Geocoder();
               geocoder.addressSearch(address, (result, status) => {
-                if (status === window.kakao.maps.services.Status.OK) {
+                if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
                   setUserPosition({
                     lat: parseFloat(result[0].y),
                     lng: parseFloat(result[0].x),
                   });
                 } else {
-                  console.warn("주소 변환 실패, GPS 시도");
+                  console.warn("주소 → 좌표 변환 실패, GPS fallback");
                   fallbackToGPS();
                 }
               });
             });
           };
         } else {
+          console.warn("detailAddress 없음, GPS fallback");
           fallbackToGPS();
         }
       } catch (e) {
-        console.warn("주소 불러오기 실패, GPS 시도");
+        console.warn("사용자 정보 요청 실패:", e);
         fallbackToGPS();
       }
     };
@@ -61,23 +62,25 @@ function MapSection() {
     const fallbackToGPS = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
+          (pos) => {
             setUserPosition({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
             });
           },
           () => {
-            console.warn("GPS 실패 → 기본 위치 사용");
+            setUserPosition({ lat: 37.5665, lng: 126.978 }); // 서울 시청
           }
         );
+      } else {
+        setUserPosition({ lat: 37.5665, lng: 126.978 });
       }
     };
 
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 2. 모집 글 로드
+  // ✅ 2. 모집 글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
@@ -101,7 +104,7 @@ function MapSection() {
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 3. 지도 + 마커 + 오버레이 표시
+  // ✅ 3. 지도 생성 및 마커/오버레이
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
