@@ -70,10 +70,6 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
     }
   };
 
-  const handleWithdraw = () => {
-    alert("정말로 회원을 탈퇴하시겠습니까?");
-  };
-
   return (
     <div className="profile-info">
       <img
@@ -130,10 +126,6 @@ function ProfileInfo({ nickname, email, address, profileImage, onUpdate }) {
           </div>
         </div>
       </div>
-
-      <button className="withdraw-btn" onClick={handleWithdraw}>
-        <span className="sb-14">회원 탈퇴</span>
-      </button>
 
       {showMapModal && (
         <MapModal

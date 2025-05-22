@@ -18,7 +18,7 @@ const MeetupForm = ({
   handleTimeChange,
   handleImageChange,
   handleSubmit,
-  handleLocationSelect
+  handleLocationSelect,
 }) => (
   <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
     <form onSubmit={handleSubmit}>
@@ -58,7 +58,7 @@ const MeetupForm = ({
       {showMap && (
         <MapModal2
           key={Date.now()}
-          onClose={() => setShowMap(false)} 
+          onClose={() => setShowMap(false)}
           onSelect={(data) => {
             handleLocationSelect(data);
             setShowMap(false);
@@ -71,7 +71,14 @@ const MeetupForm = ({
         onChange={(e) => handleChange("description", e.target.value)}
       />
 
-      <div style={{ display: "flex", gap: "20px", alignItems: "flex-end", marginTop: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          alignItems: "flex-end",
+          marginTop: "20px",
+        }}
+      >
         <div style={{ flex: 1 }}>
           <ImageUpload images={formData.images} onChange={handleImageChange} />
         </div>
@@ -84,7 +91,7 @@ const MeetupForm = ({
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
-            height: "fit-content"
+            height: "fit-content",
           }}
         >
           + 모임 생성하기

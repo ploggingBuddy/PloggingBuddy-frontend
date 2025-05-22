@@ -45,13 +45,12 @@ const DeadlineInput = ({ deadline, onChange }) => (
             value={value}
             onChange={(e) => {
               const val = e.target.value;
-              // if (
-              //   /^\d*$/.test(val) &&
-              //   (val === "" || (Number(val) >= min && Number(val) <= max))
-              // ) {
-              //   onChange(key, val);
-              // }
-              onChange(key, val);
+              if (
+                /^\d*$/.test(val) &&
+                (val === "" || (Number(val) >= min && Number(val) <= max))
+              ) {
+                onChange(key, val);
+              }
             }}
             min={min}
             max={max}

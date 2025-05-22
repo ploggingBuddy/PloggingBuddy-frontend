@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
 import MeetupForm from "../components/MeetupForm.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CreateMeetup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     maxParticipants: "",
