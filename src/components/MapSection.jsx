@@ -14,34 +14,57 @@ function MapSection() {
     lng: 126.978,
   });
 
-  // ✅ SDK 공통 로드 함수 (services 포함)
-  const loadKakaoMapSDK = (onReady) => {
-    const scriptId = "kakao-map-sdk";
-
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
-      script.async = true;
-      script.onload = () => {
-        console.log("✅ Kakao SDK 로드 완료");
-        window.kakao.maps.load(() => {
-          console.log("✅ Kakao.maps.load 완료");
-          onReady();
-        });
-      };
-      document.head.appendChild(script);
-    } else {
-      console.log("🟡 Kakao SDK 이미 로드됨");
-      window.kakao.maps.load(() => {
-        console.log("✅ Kakao.maps.load 완료 (재로드)");
-        onReady();
-      });
-    }
-  };
-
-  // ✅ 사용자 주소 기반 좌표 설정
+  // ✅ 1. 사용자 주소 기반 좌표 설정
   useEffect(() => {
+    const fetchUserAddress = async () => {
+      try {
+        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        const rawAddress = data.detailAddress;
+        console.log("📦 받아온 detailAddress:", rawAddress);
+
+        if (rawAddress && rawAddress.trim() !== "") {
+          const simplifiedAddress = rawAddress.split(" ").slice(0, 3).join(" ");
+          console.log("🔍 검색용 주소:", simplifiedAddress);
+          loadKakaoMapSDK(() => {
+            try {
+              const geocoder = new window.kakao.maps.services.Geocoder();
+              console.log("✅ Geocoder 생성됨");
+
+              geocoder.addressSearch(simplifiedAddress, (result, status) => {
+                console.log("🧭 지오코딩 결과:", result, "상태:", status);
+                if (
+                  status === window.kakao.maps.services.Status.OK &&
+                  result.length > 0
+                ) {
+                  const lat = parseFloat(result[0].y);
+                  const lng = parseFloat(result[0].x);
+                  console.log("📌 좌표 설정:", { lat, lng });
+                  setUserPosition({ lat, lng });
+                } else {
+                  console.warn("❌ 주소 변환 실패 → fallback to GPS");
+                  fallbackToGPS();
+                }
+              });
+            } catch (error) {
+              console.error("🔴 지오코딩 중 예외 발생:", error);
+              fallbackToGPS();
+            }
+          });
+        } else {
+          console.warn("⚠️ detailAddress 없음 → fallback to GPS");
+          fallbackToGPS();
+        }
+      } catch (err) {
+        console.warn("🔴 사용자 정보 불러오기 실패:", err);
+        fallbackToGPS();
+      }
+    };
+
     const fallbackToGPS = () => {
       if (navigator.geolocation) {
         console.log("📡 GPS 위치 요청 시작");
@@ -64,56 +87,32 @@ function MapSection() {
       }
     };
 
-    const fetchUserAddress = async () => {
-      try {
-        const res = await fetch(`${BACKEND_API_URL}/member/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        const rawAddress = data.detailAddress;
-        console.log("📦 받아온 detailAddress:", rawAddress);
-
-        if (rawAddress && rawAddress.trim() !== "") {
-          const simplifiedAddress = rawAddress.split(" ").slice(0, 3).join(" ");
-          console.log("🔍 검색용 주소:", simplifiedAddress);
-
-          loadKakaoMapSDK(() => {
-            try {
-              const geocoder = new window.kakao.maps.services.Geocoder();
-              geocoder.addressSearch(simplifiedAddress, (result, status) => {
-                console.log("🧭 지오코딩 결과:", result, "상태:", status);
-                if (
-                  status === window.kakao.maps.services.Status.OK &&
-                  result.length > 0
-                ) {
-                  const lat = parseFloat(result[0].y);
-                  const lng = parseFloat(result[0].x);
-                  console.log("📌 좌표 설정:", { lat, lng });
-                  setUserPosition({ lat, lng });
-                } else {
-                  console.warn("❌ 주소 변환 실패 → fallback to GPS");
-                  fallbackToGPS();
-                }
-              });
-            } catch (error) {
-              console.error("🔴 Geocoder 생성 실패:", error);
-              fallbackToGPS();
-            }
+    const loadKakaoMapSDK = (onGeocoderReady) => {
+      if (!document.querySelector('script[src*="dapi.kakao.com"]')) {
+        const script = document.createElement("script");
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services`;
+        script.async = true;
+        script.onload = () => {
+          console.log("✅ Kakao SDK 로드 완료");
+          window.kakao.maps.load(() => {
+            console.log("✅ Kakao.maps.load 완료");
+            onGeocoderReady();
           });
-        } else {
-          console.warn("⚠️ detailAddress 없음 → fallback to GPS");
-          fallbackToGPS();
-        }
-      } catch (err) {
-        console.warn("🔴 사용자 정보 불러오기 실패:", err);
-        fallbackToGPS();
+        };
+        document.head.appendChild(script);
+      } else {
+        console.log("🟡 Kakao SDK 이미 로드됨");
+        window.kakao.maps.load(() => {
+          console.log("✅ Kakao.maps.load 완료 (재로드)");
+          onGeocoderReady();
+        });
       }
     };
 
     fetchUserAddress();
   }, [token]);
 
-  // ✅ 모집 글 불러오기
+  // ✅ 2. 모집 글 불러오기
   useEffect(() => {
     const fetchMeetups = async () => {
       const { lat, lng } = userPosition;
@@ -122,7 +121,9 @@ function MapSection() {
         const response = await fetch(
           `${BACKEND_API_URL}/gathering/spot/${lat}/${lng}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         const data = await response.json();
@@ -136,9 +137,9 @@ function MapSection() {
     fetchMeetups();
   }, [userPosition, token]);
 
-  // ✅ 지도 및 마커 렌더링
+  // ✅ 3. 지도 + 마커 + 오버레이 표시
   useEffect(() => {
-    loadKakaoMapSDK(() => {
+    const loadMap = () => {
       const container = document.getElementById("map");
       if (!container) {
         console.error("❌ map div 없음");
@@ -172,7 +173,9 @@ function MapSection() {
 
           try {
             const res = await fetch(`${BACKEND_API_URL}/gathering/${item.gatheringPostId}`, {
-              headers: { Authorization: `Bearer ${token}` },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             });
             const detail = await res.json();
 
@@ -220,7 +223,21 @@ function MapSection() {
           }
         });
       });
-    });
+    };
+
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false`;
+    script.async = true;
+    script.onload = () => {
+      console.log("🗺 Kakao 지도 SDK (기본) 로드 완료");
+      window.kakao.maps.load(loadMap);
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      const existing = document.querySelector('script[src*="dapi.kakao.com"]');
+      if (existing) document.head.removeChild(existing);
+    };
   }, [meetups, userPosition]);
 
   return (
