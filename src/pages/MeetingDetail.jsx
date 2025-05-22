@@ -50,7 +50,6 @@ function MeetingDetail() {
         setMeeting(data);
         setMaxParticipants(data.participantMaxNumber);
         setIsCreator(data.isAuthor);
-        setCurrentParticipants(data.currentParticipants);
         setStatusClass(
           data.gatheringStatus === "GATHERING_CONFIRMED"
             ? "closed"
