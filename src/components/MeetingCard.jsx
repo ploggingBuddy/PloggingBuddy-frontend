@@ -11,6 +11,8 @@ function MeetingCard({
   participantMaxNumber,
   postId,
   postStatus,
+  nickname,
+  gatheringTime,
 }) {
   let statusClass = "";
   if (postStatus === "GATHERING_CONFIRMED") statusClass = "closed";
@@ -31,12 +33,15 @@ function MeetingCard({
             ? "모집 마감 보류"
             : "모집 중"}
         </div>
-        {/* <span className="rg-14">생성자: {leadUserNickname}</span> */}
+        <span className="rg-14">생성자: {nickname}</span>
         <span className="rg-14">
           현재 참여 인원: {participantCurrentNumber}/{participantMaxNumber}명
         </span>
         <span className="rg-14">모집 기한 {formatDate(gatheringEndTime)}</span>
         <span className="rg-14">모임 장소: {formatAddress(detailAddress)}</span>
+        <span className="rg-14">
+          모임 시간: {formatDateTime(gatheringTime)}
+        </span>
         <div className="card-desc rg-14">{content}</div>
       </div>
     </div>

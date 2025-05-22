@@ -47,7 +47,7 @@ function MeetingDetail() {
         console.log(data);
         setMeeting(data);
         setMaxParticipants(data.participantMaxNumber);
-        setIsCreator(data.isCreator);
+        setIsCreator(data.isAuthor);
         setCurrentParticipants(data.currentParticipants);
         setStatusClass(
           data.gatheringStatus === "GATHERING_CONFIRMED"
@@ -222,12 +222,12 @@ function MeetingDetail() {
             <div className="info-item">
               <span className="label rg-14">참여 인원</span>
               <span className="value sb-14">
-                {meeting.currentParticipants} / {meeting.participantMaxNumber}명
+                {meeting.participantMaxNumber}명
               </span>
             </div>
 
             {/* 모임 생성자인 경우에만 인원 변경 버튼 표시 */}
-            {!isCreator && (
+            {isCreator && (
               <div className="info-item">
                 <div className="max-participants-control">
                   <input
@@ -288,7 +288,7 @@ function MeetingDetail() {
               <span className="sb-14">신청하기</span>
             </button>
           )}
-          {!isCreator && (
+          {isCreator && (
             <div>
               <button
                 className="delete-meeting-btn"
