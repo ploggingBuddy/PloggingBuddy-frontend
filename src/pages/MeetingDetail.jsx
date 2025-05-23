@@ -241,33 +241,29 @@ function MeetingDetail() {
             </div>
 
             {/* 모임 생성자인 경우에만 인원 변경 버튼 표시 */}
-            {isCreator &&
-              meeting.gatheringStatus !== "GATHERING_CONFIRMED" &&
-              isEnrolled && (
-                <div className="info-item">
-                  <div className="max-participants-control">
-                    <input
-                      type="range"
-                      min={meeting.currentParticipants ?? 1}
-                      max={10}
-                      value={maxParticipants}
-                      onChange={(e) =>
-                        setMaxParticipants(Number(e.target.value))
-                      }
-                      className="max-participants-range"
-                    />
-                    <span className="max-participants-value sb-14">
-                      {maxParticipants}명
-                    </span>
-                    <button
-                      className="change-max-btn"
-                      onClick={handleChangeMaxParticipants}
-                    >
-                      <span className="sb-14">인원 변경</span>
-                    </button>
-                  </div>
+            {isCreator && meeting.gatheringStatus !== "GATHERING_CONFIRMED" && (
+              <div className="info-item">
+                <div className="max-participants-control">
+                  <input
+                    type="range"
+                    min={meeting.currentParticipants ?? 1}
+                    max={10}
+                    value={maxParticipants}
+                    onChange={(e) => setMaxParticipants(Number(e.target.value))}
+                    className="max-participants-range"
+                  />
+                  <span className="max-participants-value sb-14">
+                    {maxParticipants}명
+                  </span>
+                  <button
+                    className="change-max-btn"
+                    onClick={handleChangeMaxParticipants}
+                  >
+                    <span className="sb-14">인원 변경</span>
+                  </button>
                 </div>
-              )}
+              </div>
+            )}
             {meeting.gatheringStatus !== "GATHERING_CONFIRMED" && (
               <div className="info-item">
                 <span className="label rg-14">모집 기간</span>
