@@ -50,7 +50,7 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
 
 </br>
   
-<img width="435" alt="image" src="https://github.com/user-attachments/assets/1d4afb90-1e46-4989-9a8a-e66e9390d213">
+<img width="435" alt="image" src="https://github.com/user-attachments/assets/2ff426ef-51d3-423a-b847-0053378f7ff7">
 
 
 </br>
