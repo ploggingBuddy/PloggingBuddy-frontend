@@ -11,14 +11,14 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
     <tr>
       <td align="center" style="padding: 20px;" width="320">
         <a href="https://github.com/jiyucat" target="_blank">
-          <img src="https://github.com/user-attachments/assets/20cf4399-30ad-4d4d-8f9d-c42382887668" width="300" style="border-radius: 50%;" alt="김지유"/><br />
+          <img src="https://github.com/user-attachments/assets/df483d76-06eb-406e-81b0-a9fb6cdcdb7d" width="300" style="border-radius: 50%;" alt="김지유"/><br />
           <h3 style="margin: 10px 0 5px; color: #007acc;">김지유</h3>
           <p style="margin: 0; font-weight: bold; color: #555;"></p>
         </a>
       </td>
       <td align="center" style="padding: 20px;" width="340">
         <a href="https://github.com/DeveloperJongseok" target="_blank">
-          <img src="https://github.com/user-attachments/assets/25b5295b-475c-4656-8f53-e23a1392880f" width="300" style="border-radius: 50%;" alt="이종석"/><br />
+          <img src="https://github.com/user-attachments/assets/ad57122c-aa0a-40cb-a59e-8224c24ebb7f" width="300" style="border-radius: 50%;" alt="이종석"/><br />
           <h3 style="margin: 10px 0 5px; color: #007acc;">이종석</h3>
           <p style="margin: 0; font-weight: bold; color: #555;"></p>
         </a>
@@ -85,7 +85,7 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
 
 </br>
 <img width="684" alt="image" src="https://github.com/user-attachments/assets/77dffac1-c314-44ef-93cc-2d39ea1b39a6">
-<img width="435" alt="image" src="https://github.com/user-attachments/assets/e0944e45-8c26-4967-b758-36bf1a868e97">
+<img width="435" alt="image" src="https://github.com/user-attachments/assets/8eac701f-d6b9-4c5a-a4a1-b49ee804ff9a">
 
 
 </br>
