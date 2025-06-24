@@ -59,9 +59,9 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
 - 5km 반경 이내 모임 조회
 
 
-<img width="704" alt="image" src="https://github.com/user-attachments/assets/2fd39fb9-5349-4e5f-aa43-ce8f3dbbb05d">
+<img width="704" alt="image" src="https://github.com/user-attachments/assets/9fdaa9f6-996d-401c-bf47-2c9ebbcb692b">
 
-<img width="684" alt="image" src="https://github.com/user-attachments/assets/3b6cc8ff-1977-477e-9d01-7d83eaca67ac">
+<img width="684" alt="image" src="https://github.com/user-attachments/assets/bff073bc-334b-4aeb-9853-cb7bc151f9d5">
 
 
 </br>
@@ -73,9 +73,9 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
 - 모임 생성 및 모임 참가 신청
 
 </br>
-<img width="684" alt="image" src="https://github.com/user-attachments/assets/82c0177c-611b-41fe-bef9-aa6b9b75b918">
-<img width="684" alt="image" src="https://github.com/user-attachments/assets/37296b7e-5857-459a-8cde-369d66dd556e">
-<img width="684" alt="image" src="https://github.com/user-attachments/assets/3f2ff484-e0ec-433f-bd1f-f13f4bf9c2ec">
+<img width="684" alt="image" src="https://github.com/user-attachments/assets/ff8c0d72-90e3-4521-9a1d-d83e1b7f09a0">
+<img width="684" alt="image" src="https://github.com/user-attachments/assets/3d2ea6ca-e7f9-46c9-a880-e6d90e42672c">
+<img width="684" alt="image" src="https://github.com/user-attachments/assets/3c41434a-f091-44f4-a2c1-e1056625a6e2">
 
 
 </br>
@@ -84,7 +84,7 @@ Plogging Buddy는 사용자의 위치 기반으로 플로깅 모임을 조회하
 - 개인정보 및 모임 관리
 
 </br>
-<img width="684" alt="image" src="https://github.com/user-attachments/assets/297471b5-e448-474a-9bf4-cea4e96caae8">
+<img width="684" alt="image" src="https://github.com/user-attachments/assets/77dffac1-c314-44ef-93cc-2d39ea1b39a6">
 <img width="435" alt="image" src="https://github.com/user-attachments/assets/e0944e45-8c26-4967-b758-36bf1a868e97">
 
 
